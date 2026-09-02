@@ -1,0 +1,10 @@
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+node_modules/
+
+# Nunca versionar chaves privadas do Supabase
+*service-role*
+*service_role*

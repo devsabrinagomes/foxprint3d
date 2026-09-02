@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FOX PRINT 3D — peças personalizadas em impressão 3D. Consulte catálogo, preços e peça pelo WhatsApp." />
+  <title>FOX PRINT 3D | Impressão 3D personalizada</title>
+  <link rel="icon" type="image/png" href="marca/logo-foxprint3d.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a class="brand" href="#inicio" aria-label="FOX PRINT 3D">
+        <img class="brand-logo" src="marca/logo-foxprint3d.png" alt="" />
+        <span class="brand-name"><span class="brand-mark">FOX</span> PRINT 3D</span>
+      </a>
+      <nav>
+        <a href="#catalogo">Catálogo</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#duvidas">Dúvidas</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <a class="btn btn-small" data-wa="Oi! Vim pelo site da FOX PRINT 3D e queria tirar uma dúvida com vocês.">Falar no WhatsApp</a>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">IMPRESSÃO 3D PERSONALIZADA</span>
+          <h1>Peças criativas, presentes e personalizados feitos em 3D.</h1>
+          <p>Nós transformamos ideias em peças únicas. Escolha um modelo do catálogo e fale conosco para combinarmos cores, personalização, entrega e prazo.</p>
+          <div class="hero-actions">
+            <a class="btn" href="#catalogo">Ver catálogo</a>
+            <a class="btn btn-outline" data-wa="Oi! Vim pelo site da FOX PRINT 3D e queria fazer um orçamento com vocês.">Pedir orçamento</a>
+          </div>
+          <div class="hero-badges" aria-label="Diferenciais da FOX PRINT 3D">
+            <span>Personalizável</span><span>Produção sob encomenda</span><span>Atendimento direto</span>
+          </div>
+        </div>
+        <div class="hero-card">
+          <img class="hero-logo" src="marca/logo-foxprint3d.png" alt="Logotipo FOX PRINT 3D: raposa laranja inspirada em impressão 3D" />
+          <span>Ideias que ganham forma.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="catalogo">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="eyebrow">CATÁLOGO</span>
+            <h2>Escolha sua peça</h2>
+          </div>
+          <div class="filters" role="group" aria-label="Filtros do catálogo">
+            <button class="filter active" data-filter="todos" aria-pressed="true">Todos</button>
+            <button class="filter" data-filter="decoracao" aria-pressed="false">Decoração</button>
+            <button class="filter" data-filter="presentes" aria-pressed="false">Presentes</button>
+            <button class="filter" data-filter="utilidades" aria-pressed="false">Utilidades</button>
+          </div>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+          <article class="product-card" data-category="presentes" data-images="assets/produtos/porta-medalhas-1.jpg,assets/produtos/porta-medalhas-2.jpg,assets/produtos/porta-medalhas-3.jpg">
+            <div class="product-image" data-gallery data-photo-count="3 fotos" aria-label="Galeria com 3 fotos do Porta-medalhas"><span class="image-placeholder">🏅<small>Galeria do produto</small><span class="placeholder-dots" aria-hidden="true">● ● ●</span></span></div>
+            <div class="product-body">
+              <span class="tag">Personalizável</span>
+              <h3>Porta-medalhas 5K / 10K / 15K</h3>
+              <p>Modelo para corredores, com números e nome personalizáveis.</p>
+              <div class="price-row"><span>A partir de</span><strong>R$ 30,00</strong></div>
+              <a class="btn btn-full" data-wa="Oi! Tenho interesse no Porta-medalhas 5K/10K/15K. Queria saber sobre personalização, entrega e prazo.">Quero esse</a>
+            </div>
+          </article>
+
+          <article class="product-card" data-category="presentes" data-images="assets/produtos/chaveiros-1.jpg,assets/produtos/chaveiros-2.jpg,assets/produtos/chaveiros-3.jpg">
+            <div class="product-image" data-gallery data-photo-count="3 fotos" aria-label="Galeria com 3 fotos dos Chaveiros personalizados"><span class="image-placeholder">🔑<small>Galeria do produto</small><span class="placeholder-dots" aria-hidden="true">● ● ●</span></span></div>
+            <div class="product-body">
+              <span class="tag">Sob encomenda</span>
+              <h3>Chaveiros personalizados</h3>
+              <p>Nomes, personagens, logos, temas de festas e outras ideias.</p>
+              <div class="price-row"><span>A partir de</span><strong>R$ 8,00</strong></div>
+              <a class="btn btn-full" data-wa="Oi! Tenho interesse em chaveiros personalizados. Queria saber valores, quantidade mínima, entrega e prazo.">Quero esse</a>
+            </div>
+          </article>
+
+          <article class="product-card" data-category="decoracao presentes" data-images="assets/produtos/miniaturas-1.jpg,assets/produtos/miniaturas-2.jpg,assets/produtos/miniaturas-3.jpg">
+            <div class="product-image" data-gallery data-photo-count="3 fotos" aria-label="Galeria com 3 fotos das Miniaturas e personagens"><span class="image-placeholder">🧍<small>Galeria do produto</small><span class="placeholder-dots" aria-hidden="true">● ● ●</span></span></div>
+            <div class="product-body">
+              <span class="tag">Personalizado</span>
+              <h3>Miniaturas e personagens</h3>
+              <p>Peças decorativas inspiradas em personagens, profissões e temas especiais.</p>
+              <div class="price-row"><span>A partir de</span><strong>R$ 35,00</strong></div>
+              <a class="btn btn-full" data-wa="Oi! Tenho interesse em uma miniatura ou personagem personalizado. Posso enviar a referência para vocês? Queria saber o prazo e o valor.">Quero esse</a>
+            </div>
+          </article>
+
+          <article class="product-card" data-category="utilidades" data-images="assets/produtos/suporte-copo-1.jpg,assets/produtos/suporte-copo-2.jpg,assets/produtos/suporte-copo-3.jpg">
+            <div class="product-image" data-gallery data-photo-count="3 fotos" aria-label="Galeria com 3 fotos do Suporte para copo ou latinha"><span class="image-placeholder">🥤<small>Galeria do produto</small><span class="placeholder-dots" aria-hidden="true">● ● ●</span></span></div>
+            <div class="product-body">
+              <span class="tag">Várias cores</span>
+              <h3>Suporte para copo ou latinha</h3>
+              <p>Modelos temáticos e divertidos para decorar sua mesa ou coleção.</p>
+              <div class="price-row"><span>A partir de</span><strong>R$ 25,00</strong></div>
+              <a class="btn btn-full" data-wa="Oi! Tenho interesse em um suporte para copo/latinha. Queria ver cores disponíveis, entrega e prazo.">Quero esse</a>
+            </div>
+          </article>
+
+          <article class="product-card" data-category="utilidades presentes" data-images="assets/produtos/carimbos-1.jpg,assets/produtos/carimbos-2.jpg,assets/produtos/carimbos-3.jpg">
+            <div class="product-image" data-gallery data-photo-count="3 fotos" aria-label="Galeria com 3 fotos dos Carimbos personalizados"><span class="image-placeholder">🪪<small>Galeria do produto</small><span class="placeholder-dots" aria-hidden="true">● ● ●</span></span></div>
+            <div class="product-body">
+              <span class="tag">Para seu negócio</span>
+              <h3>Carimbos personalizados</h3>
+              <p>Carimbos com nome, logo ou arte simples para uso pessoal ou comercial.</p>
+              <div class="price-row"><span>A partir de</span><strong>R$ 20,00</strong></div>
+              <a class="btn btn-full" data-wa="Oi! Tenho interesse em um carimbo personalizado. Posso enviar a arte para vocês? Queria saber o prazo e o valor.">Quero esse</a>
+            </div>
+          </article>
+
+          <article class="product-card" data-category="decoracao presentes" data-images="assets/produtos/lembrancinhas-1.jpg,assets/produtos/lembrancinhas-2.jpg,assets/produtos/lembrancinhas-3.jpg">
+            <div class="product-image" data-gallery data-photo-count="3 fotos" aria-label="Galeria com 3 fotos das Lembrancinhas personalizadas"><span class="image-placeholder">🎉<small>Galeria do produto</small><span class="placeholder-dots" aria-hidden="true">● ● ●</span></span></div>
+            <div class="product-body">
+              <span class="tag">Eventos</span>
+              <h3>Lembrancinhas personalizadas</h3>
+              <p>Peças para aniversários, corridas, empresas, escolas e eventos.</p>
+              <div class="price-row"><span>Preço</span><strong>Sob consulta</strong></div>
+              <a class="btn btn-full" data-wa="Oi! Tenho interesse em lembrancinhas personalizadas para um evento. Queria fazer um orçamento e saber o prazo.">Pedir orçamento</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-dark" id="como-funciona">
+      <div class="container">
+        <span class="eyebrow">COMO FUNCIONA</span>
+        <h2>Do pedido à sua mão</h2>
+        <div class="steps">
+          <div class="step"><span>01</span><h3>Você escolhe</h3><p>Explore nosso catálogo ou envie uma ideia para avaliarmos.</p></div>
+          <div class="step"><span>02</span><h3>Nós personalizamos</h3><p>Definimos com você as cores, o nome, o tamanho e os detalhes.</p></div>
+          <div class="step"><span>03</span><h3>Nós produzimos</h3><p>Confirmamos o valor e o prazo antes de iniciarmos a impressão.</p></div>
+          <div class="step"><span>04</span><h3>Nós entregamos</h3><p>Combinamos a melhor opção de retirada ou envio para você.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="duvidas">
+      <div class="container faq-grid">
+        <div>
+          <span class="eyebrow">DÚVIDAS</span>
+          <h2>Quer uma peça que não está no catálogo?</h2>
+          <p class="lead">Envie uma referência pelo WhatsApp. Nós avaliamos a produção e retornamos com o valor e o prazo.</p>
+          <a class="btn" data-wa="Oi! Quero fazer uma peça personalizada que não está no catálogo. Posso enviar uma referência para vocês?">Enviar referência</a>
+        </div>
+        <div class="faq-list">
+          <details open><summary>Qual o prazo de produção?</summary><p>O prazo depende do tamanho, acabamento e quantidade. Passamos a previsão antes da confirmação do pedido.</p></details>
+          <details><summary>Vocês enviam?</summary><p>Sim. A forma de entrega ou envio é combinada pelo WhatsApp de acordo com sua localização.</p></details>
+          <details><summary>Posso escolher a cor?</summary><p>Na maioria das peças, sim. As cores disponíveis são confirmadas no atendimento.</p></details>
+          <details><summary>Vocês fazem peças totalmente personalizadas?</summary><p>Sim, dependendo da complexidade. Envie sua ideia ou referência para avaliarmos.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta" id="contato">
+      <div class="container cta-inner">
+        <div><span class="eyebrow">FALE CONOSCO</span><h2>Tem uma ideia? Nós damos forma a ela.</h2><p>Conte o que você imaginou e nós preparamos seu orçamento.</p></div>
+        <div class="contact-actions">
+          <a class="btn btn-light" data-wa="Oi! Vim pelo site da FOX PRINT 3D e queria conversar sobre uma peça personalizada.">WhatsApp: (88) 99640-3012</a>
+          <a class="contact-email" href="mailto:foxprint3d.contato@gmail.com">foxprint3d.contato@gmail.com</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div class="footer-brand"><img src="marca/logo-foxprint3d.png" alt="FOX PRINT 3D" /><div><strong><span class="footer-fox">FOX</span> PRINT 3D</strong><p>Nós transformamos ideias em realidade.</p></div></div>
+      <div class="footer-links"><a href="#catalogo">Catálogo</a><a href="#duvidas">Dúvidas</a><a href="https://instagram.com/3dfox.print" target="_blank" rel="noreferrer">@3dfox.print</a><a href="mailto:foxprint3d.contato@gmail.com">foxprint3d.contato@gmail.com</a></div>
+    </div>
+  </footer>
+
+  <a class="floating-wa" data-wa="Oi! Vim pelo site da FOX PRINT 3D e queria tirar uma dúvida com vocês." aria-label="Falar no WhatsApp">WhatsApp</a>
+
+  <dialog class="image-modal" id="imageModal" aria-label="Visualização ampliada do produto">
+    <button class="modal-close" type="button" aria-label="Fechar imagem">×</button>
+    <button class="modal-arrow modal-prev" type="button" aria-label="Foto anterior">‹</button>
+    <figure>
+      <div class="modal-image-stage" id="modalImageStage">
+        <img id="modalImage" src="" alt="" draggable="false" />
+      </div>
+      <figcaption id="modalCaption"></figcaption>
+      <div class="modal-dots" id="modalDots" aria-label="Fotos do produto"></div>
+      <small class="swipe-hint">Arraste para os lados para ver mais fotos</small>
+    </figure>
+    <button class="modal-arrow modal-next" type="button" aria-label="Próxima foto">›</button>
+  </dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="catalog.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+FOTOS DOS PRODUTOS
+
+Coloque as fotos dos produtos nesta pasta.
+
+Os nomes esperados pelo catálogo estão no atributo data-images de cada produto
+no arquivo index.html. Exemplos:
+
+porta-medalhas-1.jpg
+porta-medalhas-2.jpg
+porta-medalhas-3.jpg
+
+Você pode usar JPG, PNG ou WebP e cadastrar quantas fotos quiser, separando os
+caminhos por vírgula no atributo data-images.
+
+Enquanto uma foto ainda não existir, o site mantém o ícone de espera e não
+exibe uma imagem quebrada.

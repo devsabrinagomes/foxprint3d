@@ -1,0 +1,146 @@
+const db = window.foxSupabase;
+const loginView = document.querySelector('#loginView');
+const adminView = document.querySelector('#adminView');
+const editor = document.querySelector('#productEditor');
+const form = document.querySelector('#productForm');
+let products = [];
+let keptImages = [];
+
+if (!db) {
+  document.querySelector('#loginStatus').textContent = 'Configure a URL e a chave pública em supabase-config.js antes de entrar.';
+  document.querySelector('#loginForm button').disabled = true;
+} else {
+  startAdmin();
+}
+
+async function startAdmin() {
+  const { data } = await db.auth.getSession();
+  showSession(data.session);
+  db.auth.onAuthStateChange((_event, session) => showSession(session));
+}
+
+async function showSession(session) {
+  loginView.hidden = Boolean(session);
+  adminView.hidden = !session;
+  if (session) await loadProducts();
+}
+
+document.querySelector('#loginForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const status = document.querySelector('#loginStatus');
+  status.textContent = 'Entrando...';
+  const { error } = await db.auth.signInWithPassword({
+    email: document.querySelector('#loginEmail').value,
+    password: document.querySelector('#loginPassword').value
+  });
+  status.textContent = error ? `Não foi possível entrar: ${error.message}` : '';
+});
+
+document.querySelector('#logoutButton').addEventListener('click', () => db.auth.signOut());
+document.querySelector('#newProductButton').addEventListener('click', () => openEditor());
+document.querySelector('.editor-close').addEventListener('click', () => editor.close());
+
+async function loadProducts() {
+  const container = document.querySelector('#adminProducts');
+  container.innerHTML = '<p>Carregando produtos...</p>';
+  const { data, error } = await db.from('products').select('*').order('position');
+  if (error) return container.innerHTML = `<p>Erro: ${escapeHtml(error.message)}</p>`;
+  products = data || [];
+  container.innerHTML = products.length ? products.map((product) => `
+    <article class="admin-product">
+      ${product.images?.[0] ? `<img src="${escapeHtml(product.images[0])}" alt="">` : '<div class="admin-product-placeholder">📦</div>'}
+      <div><h3>${escapeHtml(product.name)}</h3><p>${formatPrice(product.price)} · ${escapeHtml(product.category)} · ${product.images?.length || 0} foto(s)</p></div>
+      <span class="status-pill${product.active ? '' : ' off'}">${product.active ? 'Visível' : 'Oculto'}</span>
+      <div class="admin-actions"><button data-edit="${product.id}">Editar</button><button data-delete="${product.id}">Excluir</button></div>
+    </article>`).join('') : '<p>Nenhum produto cadastrado.</p>';
+
+  container.querySelectorAll('[data-edit]').forEach((button) => button.addEventListener('click', () => openEditor(products.find((item) => item.id === button.dataset.edit))));
+  container.querySelectorAll('[data-delete]').forEach((button) => button.addEventListener('click', () => deleteProduct(button.dataset.delete)));
+}
+
+function openEditor(product = null) {
+  form.reset();
+  keptImages = [...(product?.images || [])];
+  document.querySelector('#editorTitle').textContent = product ? 'Editar produto' : 'Novo produto';
+  document.querySelector('#productId').value = product?.id || '';
+  document.querySelector('#productName').value = product?.name || '';
+  document.querySelector('#productPrice').value = product?.price ?? '';
+  document.querySelector('#productCategory').value = product?.category || 'presentes';
+  document.querySelector('#productTag').value = product?.tag || '';
+  document.querySelector('#productPosition').value = product?.position ?? products.length;
+  document.querySelector('#productDescription').value = product?.description || '';
+  document.querySelector('#productActive').checked = product?.active ?? true;
+  document.querySelector('#productStatus').textContent = '';
+  renderExistingImages();
+  editor.showModal();
+}
+
+function renderExistingImages() {
+  const container = document.querySelector('#existingImages');
+  container.innerHTML = keptImages.map((url, index) => `<div class="existing-image"><img src="${escapeHtml(url)}" alt="Foto ${index + 1}"><button type="button" data-remove-image="${index}" aria-label="Remover foto">×</button></div>`).join('');
+  container.querySelectorAll('[data-remove-image]').forEach((button) => button.addEventListener('click', () => {
+    keptImages.splice(Number(button.dataset.removeImage), 1);
+    renderExistingImages();
+  }));
+}
+
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const submit = form.querySelector('[type="submit"]');
+  const status = document.querySelector('#productStatus');
+  submit.disabled = true;
+  status.textContent = 'Enviando fotos e salvando...';
+  try {
+    const newImages = await uploadImages([...document.querySelector('#productImages').files]);
+    const priceValue = document.querySelector('#productPrice').value;
+    const payload = {
+      name: document.querySelector('#productName').value.trim(),
+      description: document.querySelector('#productDescription').value.trim(),
+      price: priceValue === '' ? null : Number(priceValue),
+      category: document.querySelector('#productCategory').value,
+      tag: document.querySelector('#productTag').value.trim() || 'Sob encomenda',
+      position: Number(document.querySelector('#productPosition').value) || 0,
+      active: document.querySelector('#productActive').checked,
+      images: [...keptImages, ...newImages],
+      updated_at: new Date().toISOString()
+    };
+    const id = document.querySelector('#productId').value;
+    const query = id ? db.from('products').update(payload).eq('id', id) : db.from('products').insert(payload);
+    const { error } = await query;
+    if (error) throw error;
+    editor.close();
+    await loadProducts();
+  } catch (error) {
+    status.textContent = `Erro: ${error.message}`;
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+async function uploadImages(files) {
+  const urls = [];
+  for (const file of files) {
+    if (file.size > 5 * 1024 * 1024) throw new Error(`${file.name} ultrapassa 5 MB.`);
+    const extension = file.name.split('.').pop().toLowerCase();
+    const path = `${crypto.randomUUID()}.${extension}`;
+    const { error } = await db.storage.from('products').upload(path, file, { cacheControl: '3600' });
+    if (error) throw error;
+    urls.push(db.storage.from('products').getPublicUrl(path).data.publicUrl);
+  }
+  return urls;
+}
+
+async function deleteProduct(id) {
+  const product = products.find((item) => item.id === id);
+  if (!confirm(`Excluir “${product.name}”? Essa ação não pode ser desfeita.`)) return;
+  const { error } = await db.from('products').delete().eq('id', id);
+  if (error) return alert(`Erro: ${error.message}`);
+  await loadProducts();
+}
+
+function escapeHtml(value = '') {
+  return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[char]);
+}
+function formatPrice(value) {
+  return value == null ? 'Sob consulta' : Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
