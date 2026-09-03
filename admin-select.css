@@ -103,6 +103,8 @@
   font-weight: 800;
 }
 
+.new-category-input:not([hidden]){display:block;margin-top:8px}
+
 @media (max-width: 760px) {
   .custom-select-trigger {
     min-height: 48px;

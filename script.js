@@ -8,10 +8,10 @@ document.querySelectorAll('[data-wa]').forEach((el) => {
   el.rel = 'noreferrer';
 });
 
-const buttons = document.querySelectorAll('.filter');
-buttons.forEach((button) => {
-  button.addEventListener('click', () => {
-    buttons.forEach((b) => {
+document.querySelector('.filters')?.addEventListener('click', (event) => {
+  const button = event.target.closest('.filter');
+  if (!button) return;
+    document.querySelectorAll('.filter').forEach((b) => {
       b.classList.remove('active');
       b.setAttribute('aria-pressed', 'false');
     });
@@ -23,7 +23,6 @@ buttons.forEach((button) => {
       const categories = card.dataset.category.split(' ');
       card.classList.toggle('hidden', filter !== 'todos' && !categories.includes(filter));
     });
-  });
 });
 
 // GALERIAS: adicione os arquivos na pasta assets/produtos e informe os nomes

@@ -5,6 +5,7 @@ const editor = document.querySelector('#productEditor');
 const form = document.querySelector('#productForm');
 let products = [];
 let keptImages = [];
+const defaultCategories = [['presentes', 'Presentes'], ['decoracao', 'Decoração'], ['utilidades', 'Utilidades']];
 
 if (!db) {
   document.querySelector('#loginStatus').textContent = 'Configure a URL e a chave pública em supabase-config.js antes de entrar.';
@@ -59,6 +60,7 @@ async function loadProducts() {
   const { data, error } = await db.from('products').select('*').order('position');
   if (error) return container.innerHTML = `<p>Erro: ${escapeHtml(error.message)}</p>`;
   products = data || [];
+  refreshCategoryOptions();
   container.innerHTML = products.length ? products.map((product) => `
     <article class="admin-product">
       ${product.images?.[0] ? `<img src="${escapeHtml(product.images[0])}" alt="">` : '<div class="admin-product-placeholder">📦</div>'}
@@ -78,7 +80,9 @@ function openEditor(product = null) {
   document.querySelector('#productId').value = product?.id || '';
   document.querySelector('#productName').value = product?.name || '';
   document.querySelector('#productPrice').value = product?.price ?? '';
-  document.querySelector('#productCategory').value = product?.category || 'presentes';
+  refreshCategoryOptions(product?.category || 'presentes');
+  document.querySelector('#productNewCategory').hidden = true;
+  document.querySelector('#productNewCategory').required = false;
   document.querySelector('#productTag').value = product?.tag || '';
   document.querySelector('#productPosition').value = product?.position ?? products.length;
   document.querySelector('#productDescription').value = product?.description || '';
@@ -106,13 +110,18 @@ form.addEventListener('submit', async (event) => {
   submit.disabled = true;
   status.textContent = 'Enviando fotos e salvando...';
   try {
+    const categorySelect = document.querySelector('#productCategory');
+    const category = categorySelect.value === '__new'
+      ? categorySlug(document.querySelector('#productNewCategory').value)
+      : categorySelect.value;
+    if (!category) throw new Error('Informe o nome da nova categoria.');
     const newImages = await uploadImages([...document.querySelector('#productImages').files]);
     const priceValue = document.querySelector('#productPrice').value;
     const payload = {
       name: document.querySelector('#productName').value.trim(),
       description: document.querySelector('#productDescription').value.trim(),
       price: priceValue === '' ? null : Number(priceValue),
-      category: document.querySelector('#productCategory').value,
+      category,
       tag: document.querySelector('#productTag').value.trim() || 'Sob encomenda',
       position: Number(document.querySelector('#productPosition').value) || 0,
       active: document.querySelector('#productActive').checked,
@@ -131,6 +140,36 @@ form.addEventListener('submit', async (event) => {
     submit.disabled = false;
   }
 });
+
+document.querySelector('#productCategory').addEventListener('change', (event) => {
+  const input = document.querySelector('#productNewCategory');
+  const creating = event.target.value === '__new';
+  input.hidden = !creating;
+  input.required = creating;
+  if (creating) requestAnimationFrame(() => input.focus());
+  else input.value = '';
+});
+
+function refreshCategoryOptions(selectedValue) {
+  const select = document.querySelector('#productCategory');
+  const current = selectedValue || (select.value !== '__new' ? select.value : 'presentes');
+  const categories = new Map(defaultCategories);
+  products.forEach((product) => {
+    if (product.category) categories.set(product.category, categoryLabel(product.category));
+  });
+  if (current && !categories.has(current)) categories.set(current, categoryLabel(current));
+  select.innerHTML = [...categories].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('') + '<option value="__new">+ Nova categoria</option>';
+  select.value = current || 'presentes';
+  window.syncCustomSelects?.();
+}
+
+function categorySlug(value) {
+  return value.trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+}
+
+function categoryLabel(value) {
+  return String(value).replace(/[-_]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
 async function uploadImages(files) {
   const urls = [];

@@ -20,6 +20,10 @@
     : Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
   const grid = document.querySelector('#productGrid');
+  const categoryLabel = (value) => String(value).replace(/[-_]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase());
+  const categories = [...new Set(products.map((product) => product.category).filter(Boolean))];
+  document.querySelector('.filters').innerHTML = '<button class="filter active" data-filter="todos" aria-pressed="true">Todos</button>'
+    + categories.map((category) => `<button class="filter" data-filter="${escapeHtml(category)}" aria-pressed="false">${escapeHtml(categoryLabel(category))}</button>`).join('');
   grid.innerHTML = products.map((product) => {
     const images = Array.isArray(product.images) ? product.images : [];
     const title = escapeHtml(product.name);
