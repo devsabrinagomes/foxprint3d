@@ -22,6 +22,8 @@
     padding-inline: 28px;
   }
 
+  .admin-authenticated .admin-header{left:220px;padding-inline:28px}
+
   .sidebar-brand {
     font-size: 15px;
   }
@@ -34,8 +36,10 @@
 @media (max-width: 760px) {
   .admin-content {
     margin-left: 0;
-    padding: 26px 16px 52px;
+    padding: 100px 16px 52px;
   }
+
+  .admin-authenticated .admin-header{left:0;padding-inline:14px}
 
   .admin-title {
     align-items: stretch;

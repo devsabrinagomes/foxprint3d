@@ -24,7 +24,29 @@
 }
 
 .admin-authenticated .admin-header {
+  position: fixed;
+  right: 0;
+  left: 255px;
+  display: flex;
+  height: 72px;
+  padding: 0 clamp(24px, 4vw, 60px);
+}
+
+.admin-header-title {
   display: none;
+  font-size: 14px;
+}
+
+.admin-authenticated .admin-header-title {
+  display: block;
+}
+
+.admin-authenticated .admin-header > .brand {
+  display: none;
+}
+
+.admin-authenticated .admin-header .admin-back {
+  margin-left: auto;
 }
 
 .admin-layout {
@@ -182,7 +204,7 @@
 .admin-content {
   min-width: 0;
   margin-left: 255px;
-  padding: 46px clamp(24px, 4vw, 60px) 70px;
+  padding: 118px clamp(24px, 4vw, 60px) 70px;
 }
 
 .sidebar-backdrop {
@@ -192,6 +214,7 @@
 @media (max-width: 760px) {
   .admin-authenticated .admin-header {
     display: flex;
+    left: 0;
   }
 
   .admin-header {
@@ -213,6 +236,11 @@
   .admin-authenticated .brand-logo {
     width: 36px;
     height: 36px;
+  }
+
+  .admin-authenticated .admin-header-title {
+    display: block;
+    font-size: 13px;
   }
 
   .admin-authenticated .brand-name {
@@ -244,6 +272,6 @@
 
   .admin-content {
     margin-left: 0;
-    padding: 28px 16px 55px;
+    padding: 100px 16px 55px;
   }
 }
