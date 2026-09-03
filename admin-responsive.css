@@ -22,6 +22,105 @@
   vertical-align: middle;
 }
 
+html,
+body,
+.admin-sidebar,
+.admin-content,
+.product-editor,
+.sales-table-wrap,
+.kanban {
+  scrollbar-color: #555 #111;
+  scrollbar-width: thin;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: #101010;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid #101010;
+  border-radius: 999px;
+  background: #555;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--orange);
+}
+
+::-webkit-scrollbar-corner {
+  background: #101010;
+}
+
+.kanban {
+  display: flex;
+  align-items: stretch;
+}
+
+.kanban-column {
+  width: 280px;
+  flex: 0 0 280px;
+  transition: width .22s ease, flex-basis .22s ease;
+}
+
+.kanban-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.collapse-column {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #191919;
+  color: #bbb;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.collapse-column:hover {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.kanban-column.collapsed {
+  width: 58px;
+  flex-basis: 58px;
+  min-height: 470px;
+  padding-inline: 8px;
+}
+
+.kanban-column.collapsed .kanban-head {
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 14px;
+}
+
+.kanban-column.collapsed .kanban-head h3 {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+.kanban-column.collapsed .kanban-head-actions {
+  flex-direction: column-reverse;
+}
+
+.kanban-column.collapsed .kanban-cards,
+.kanban-column.collapsed .add-job {
+  display: none;
+}
+
 @media (max-width: 1024px) {
   .admin-sidebar {
     width: 220px;
@@ -159,12 +258,19 @@
   .kanban {
     margin-inline: -16px;
     padding: 3px 16px 22px;
-    grid-template-columns: repeat(6, min(84vw, 330px));
     scroll-padding-inline: 16px;
     -webkit-overflow-scrolling: touch;
   }
 
   .kanban-column {
+    width: min(84vw, 330px);
+    flex-basis: min(84vw, 330px);
+    min-height: 440px;
+  }
+
+  .kanban-column.collapsed {
+    width: 54px;
+    flex-basis: 54px;
     min-height: 440px;
   }
 

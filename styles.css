@@ -17,6 +17,12 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:Manrope,system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.5}
+html{color-scheme:dark;scrollbar-color:#555 #101010;scrollbar-width:thin}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:#101010}
+::-webkit-scrollbar-thumb{border:3px solid #101010;border-radius:999px;background:#555}
+::-webkit-scrollbar-thumb:hover{background:var(--orange)}
+::-webkit-scrollbar-corner{background:#101010}
 ::selection{background:var(--orange);color:#fff}
 .container{width:min(1180px,calc(100% - 40px));margin:auto}
 

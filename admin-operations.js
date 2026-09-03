@@ -4,6 +4,7 @@ const STAGES = [
 ];
 let sales = [];
 let jobs = [];
+let collapsedStages = JSON.parse(localStorage.getItem('fox-collapsed-stages') || '[]');
 
 document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('click', async () => {
   document.querySelectorAll('.admin-tab').forEach((item) => item.classList.toggle('active', item === tab));
@@ -101,7 +102,8 @@ async function loadJobs() {
 function renderBoard() {
   document.querySelector('#kanbanBoard').innerHTML = STAGES.map(([key, label]) => {
     const stageJobs = jobs.filter((job) => job.stage === key);
-    return `<section class="kanban-column" data-stage="${key}"><div class="kanban-head"><h3>${label}</h3><span class="kanban-count">${stageJobs.length}</span></div><div class="kanban-cards">${stageJobs.map(jobCard).join('')}</div><button class="add-job" data-add-stage="${key}">＋ Adicionar cartão</button></section>`;
+    const collapsed = collapsedStages.includes(key);
+    return `<section class="kanban-column${collapsed ? ' collapsed' : ''}" data-stage="${key}"><div class="kanban-head"><h3>${label}</h3><div class="kanban-head-actions"><span class="kanban-count">${stageJobs.length}</span><button class="collapse-column" type="button" data-collapse-stage="${key}" aria-label="${collapsed ? 'Expandir' : 'Recolher'} ${label}" title="${collapsed ? 'Expandir quadro' : 'Recolher quadro'}">${collapsed ? '›' : '‹'}</button></div></div><div class="kanban-cards">${stageJobs.map(jobCard).join('')}</div><button class="add-job" data-add-stage="${key}">＋ Adicionar cartão</button></section>`;
   }).join('');
   bindBoardEvents();
 }
@@ -111,6 +113,12 @@ function jobCard(job) {
 }
 
 function bindBoardEvents() {
+  document.querySelectorAll('[data-collapse-stage]').forEach((button) => button.addEventListener('click', () => {
+    const stage = button.dataset.collapseStage;
+    collapsedStages = collapsedStages.includes(stage) ? collapsedStages.filter((item) => item !== stage) : [...collapsedStages, stage];
+    localStorage.setItem('fox-collapsed-stages', JSON.stringify(collapsedStages));
+    renderBoard();
+  }));
   document.querySelectorAll('[data-add-stage]').forEach((button) => button.addEventListener('click', () => openJob(null, button.dataset.addStage)));
   document.querySelectorAll('.job-card').forEach((card) => {
     card.addEventListener('click', () => {
