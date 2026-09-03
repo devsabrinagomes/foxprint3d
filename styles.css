@@ -167,3 +167,30 @@ footer{padding:36px 0;background:#000;color:white;border-top:1px solid #151515}
   .image-modal figcaption{padding-left:48px;padding-right:48px}
   .swipe-hint{display:block}
 }
+
+@media(max-width:430px){
+  .container{width:calc(100% - 24px)}
+  .nav{height:66px}
+  .brand-logo{width:36px;height:36px;margin-right:4px}
+  .brand-name{font-size:15px}
+  .hero{padding:42px 0 48px}
+  .hero h1{font-size:clamp(36px,11vw,44px);line-height:1.02}
+  .hero p,.lead{font-size:16px}
+  .hero-card{min-height:240px;border-radius:24px;padding:14px}
+  .hero-logo{max-height:260px}
+  .hero-badges{display:grid;grid-template-columns:1fr;width:100%}
+  .hero-badges span{justify-content:center}
+  .section{padding:54px 0}
+  .section h2,.cta h2{font-size:32px}
+  .product-card{border-radius:18px}
+  .product-body{padding:18px}
+  .product-card p{min-height:0}
+  .price-row{gap:12px}
+  .price-row strong{text-align:right}
+  .steps{gap:10px}
+  .step{padding:20px}
+  .footer-links{display:grid;gap:12px}
+  .contact-actions,.contact-actions .btn{width:100%}
+  .contact-email{overflow-wrap:anywhere}
+  .floating-wa{bottom:max(14px,env(safe-area-inset-bottom));padding:13px 16px}
+}

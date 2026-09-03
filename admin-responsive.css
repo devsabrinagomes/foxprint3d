@@ -1,0 +1,222 @@
+/* Ajustes responsivos complementares do painel administrativo. */
+.admin-content,
+.admin-view,
+.sales-table-wrap,
+.kanban {
+  max-width: 100%;
+}
+
+.product-editor {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 220px;
+  }
+
+  .admin-content {
+    margin-left: 220px;
+    padding-inline: 28px;
+  }
+
+  .sidebar-brand {
+    font-size: 15px;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-content {
+    margin-left: 0;
+    padding: 26px 16px 52px;
+  }
+
+  .admin-title {
+    align-items: stretch;
+    gap: 18px;
+  }
+
+  .admin-title h1 {
+    font-size: clamp(29px, 9vw, 38px);
+  }
+
+  .admin-title > .btn {
+    width: 100%;
+  }
+
+  .summary-card {
+    min-width: 0;
+    padding: 15px;
+  }
+
+  .summary-card strong {
+    overflow-wrap: anywhere;
+    font-size: clamp(18px, 6vw, 24px);
+  }
+
+  .admin-product {
+    grid-template-columns: 62px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .admin-product img,
+  .admin-product-placeholder {
+    width: 62px;
+    height: 62px;
+  }
+
+  .admin-product h3,
+  .admin-product p {
+    overflow-wrap: anywhere;
+  }
+
+  .admin-product .status-pill,
+  .admin-product .admin-actions {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .admin-actions button {
+    min-height: 42px;
+    padding-inline: 14px;
+  }
+
+  .sales-table-wrap {
+    overflow: visible;
+    border: 0;
+  }
+
+  .sales-table {
+    min-width: 0;
+  }
+
+  .sales-table thead {
+    display: none;
+  }
+
+  .sales-table,
+  .sales-table tbody,
+  .sales-table tr,
+  .sales-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .sales-table tbody {
+    display: grid;
+    gap: 12px;
+  }
+
+  .sales-table tr {
+    padding: 16px;
+    border: 1px solid #292929;
+    border-radius: 15px;
+    background: #111;
+  }
+
+  .sales-table td {
+    padding: 7px 0;
+    border: 0;
+  }
+
+  .sales-table td:nth-child(2)::before {
+    content: "Valor: ";
+    color: #888;
+    font-size: 12px;
+  }
+
+  .sales-table td:nth-child(4)::before {
+    content: "Entrega: ";
+    color: #888;
+    font-size: 12px;
+  }
+
+  .sales-table .row-actions button {
+    min-height: 42px;
+    padding: 0;
+  }
+
+  .kanban {
+    margin-inline: -16px;
+    padding: 3px 16px 22px;
+    grid-template-columns: repeat(6, min(84vw, 330px));
+    scroll-padding-inline: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .kanban-column {
+    min-height: 440px;
+  }
+
+  .add-job {
+    min-height: 46px;
+  }
+
+  .product-editor {
+    width: 100%;
+    max-height: calc(100dvh - 10px);
+    margin: auto 0 0;
+    padding: 22px 16px calc(18px + env(safe-area-inset-bottom));
+    border-radius: 20px 20px 0 0;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid .wide {
+    grid-column: auto;
+  }
+
+  .admin-page input,
+  .admin-page textarea,
+  .admin-page select {
+    min-height: 48px;
+    font-size: 16px;
+  }
+
+  .editor-actions {
+    position: sticky;
+    bottom: 0;
+    padding-top: 10px;
+    background: #0c0c0c;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-header .admin-back {
+    font-size: 0;
+  }
+
+  .admin-header .admin-back::after {
+    content: "Loja ↗";
+    font-size: 13px;
+  }
+
+  .admin-login {
+    margin: 5vh auto;
+    padding: 24px 18px;
+  }
+
+  .admin-login h1 {
+    font-size: 32px;
+  }
+
+  .summary-grid {
+    gap: 8px;
+  }
+
+  .summary-card {
+    padding: 13px;
+  }
+
+  .sidebar-footer {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
