@@ -7,9 +7,35 @@
 }
 
 .product-editor {
+  width: min(920px, calc(100% - 32px));
   max-height: calc(100dvh - 24px);
-  overflow-y: auto;
+  padding: 0;
+  overflow: hidden;
   overscroll-behavior: contain;
+}
+
+.product-editor > form {
+  max-height: calc(100dvh - 26px);
+  padding: 26px 30px 30px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: inherit;
+  scrollbar-gutter: stable;
+}
+
+.product-editor .editor-head {
+  position: sticky;
+  z-index: 4;
+  top: -26px;
+  margin: -26px -30px 2px;
+  padding: 25px 30px 18px;
+  border-bottom: 1px solid transparent;
+  background: rgba(12, 12, 12, .97);
+  backdrop-filter: blur(10px);
+}
+
+#saleForm .form-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .payment-info{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
@@ -285,12 +311,34 @@ body,
     width: 100%;
     max-height: calc(100dvh - 10px);
     margin: auto 0 0;
-    padding: 22px 16px calc(18px + env(safe-area-inset-bottom));
+    padding: 0;
     border-radius: 20px 20px 0 0;
+  }
+
+  .product-editor > form {
+    max-height: calc(100dvh - 10px);
+    padding: 22px 16px calc(18px + env(safe-area-inset-bottom));
+    scrollbar-gutter: auto;
+  }
+
+  .product-editor .editor-head {
+    top: -22px;
+    margin: -22px -16px 2px;
+    padding: 21px 16px 16px;
   }
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  #saleForm .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #saleForm .form-grid > .wide,
+  #saleForm .discount-control,
+  #saleForm label:has(textarea) {
+    grid-column: 1 / -1;
   }
 
   .form-grid .wide {
@@ -339,6 +387,15 @@ body,
 
   .summary-card {
     padding: 13px;
+  }
+
+  #saleForm .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #saleForm .form-grid > .wide,
+  #saleForm .discount-control {
+    grid-column: auto;
   }
 
   .sidebar-footer {
