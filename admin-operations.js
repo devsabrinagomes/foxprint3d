@@ -66,7 +66,9 @@ function openSale(sale = null) {
   document.querySelector('#saleContact').value = sale?.contact || '';
   document.querySelector('#saleDescription').value = sale?.description || '';
   document.querySelector('#saleTotal').value = sale?.total ?? '';
+  document.querySelector('#saleDiscountType').value = 'fixed';
   document.querySelector('#saleDiscount').value = sale?.discount ?? 0;
+  setDiscountVisible(Number(sale?.discount || 0) > 0);
   document.querySelector('#salePaid').value = sale?.paid ?? 0;
   document.querySelector('#saleMethod').value = sale?.payment_method || 'Pix';
   document.querySelector('#saleStatus').value = sale?.status || 'pendente';
@@ -82,7 +84,7 @@ document.querySelector('#saleForm').addEventListener('submit', async (event) => 
   event.preventDefault();
   const id = document.querySelector('#saleId').value;
   const total = Number(val('saleTotal'));
-  const discount = Number(val('saleDiscount') || 0);
+  const discount = calculateDiscount(total);
   if (discount > total) return document.querySelector('#saleStatusText').textContent = 'O desconto não pode ser maior que o valor da venda.';
   const payload = { customer: val('saleCustomer'), contact: val('saleContact'), description: val('saleDescription'), total, discount, paid: Number(val('salePaid') || 0), payment_method: val('saleMethod'), status: val('saleStatus'), sale_date: val('saleDate'), due_date: val('saleDueDate') || null, notes: val('saleNotes'), updated_at: new Date().toISOString() };
   const { error } = await (id ? db.from('sales').update(payload).eq('id', id) : db.from('sales').insert(payload));
@@ -92,11 +94,28 @@ document.querySelector('#saleForm').addEventListener('submit', async (event) => 
 
 function updateSaleTotalPreview() {
   const total = Number(document.querySelector('#saleTotal').value || 0);
-  const discount = Number(document.querySelector('#saleDiscount').value || 0);
-  document.querySelector('#saleTotalPreview').textContent = `Valor final: ${money(Math.max(0, total - discount))}`;
+  const discount = calculateDiscount(total);
+  const type = document.querySelector('#saleDiscountType').value;
+  const entered = Number(document.querySelector('#saleDiscount').value || 0);
+  const detail = discount > 0 ? ` · desconto ${type === 'percent' ? `${entered}% (${money(discount)})` : money(discount)}` : '';
+  document.querySelector('#saleTotalPreview').textContent = `Valor final: ${money(Math.max(0, total - discount))}${detail}`;
+}
+function calculateDiscount(total) {
+  if (document.querySelector('#discountFields').hidden) return 0;
+  const value = Number(document.querySelector('#saleDiscount').value || 0);
+  return document.querySelector('#saleDiscountType').value === 'percent' ? total * Math.min(value, 100) / 100 : value;
+}
+function setDiscountVisible(visible) {
+  document.querySelector('#discountFields').hidden = !visible;
+  document.querySelector('#applyDiscountButton').hidden = visible;
+  if (!visible) document.querySelector('#saleDiscount').value = 0;
+  updateSaleTotalPreview();
 }
 document.querySelector('#saleTotal').addEventListener('input', updateSaleTotalPreview);
 document.querySelector('#saleDiscount').addEventListener('input', updateSaleTotalPreview);
+document.querySelector('#saleDiscountType').addEventListener('change', updateSaleTotalPreview);
+document.querySelector('#applyDiscountButton').addEventListener('click', () => setDiscountVisible(true));
+document.querySelector('#removeDiscountButton').addEventListener('click', () => setDiscountVisible(false));
 
 document.querySelector('.delete-sale').addEventListener('click', async () => {
   const id = val('saleId');

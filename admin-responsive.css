@@ -23,6 +23,7 @@
 .discount-pill{display:inline-flex;margin-left:8px;padding:4px 7px;border-radius:999px;background:rgba(255,106,0,.14);color:#ff9b52;font-size:10px;font-weight:800;vertical-align:middle}
 .sales-table .original-value{color:#777;text-decoration:line-through}
 .sale-total-preview{padding:13px 15px;border:1px solid rgba(255,106,0,.28);border-radius:11px;background:rgba(255,106,0,.08);color:#ffad6c;font-weight:800;text-align:right}
+.discount-control{display:block}.apply-discount,.remove-discount{border:0;background:transparent;color:#ff9b52;font:inherit;font-size:13px;font-weight:800;cursor:pointer}.apply-discount{padding:8px 0}.discount-fields{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:12px;padding:15px;border:1px solid #303030;border-radius:12px;background:#131313}.discount-fields[hidden]{display:none}.remove-discount{min-height:48px;padding:0 8px;color:#aaa}.remove-discount:hover{color:#ff8b8b}
 
 html,
 body,
@@ -295,6 +296,8 @@ body,
   .form-grid .wide {
     grid-column: auto;
   }
+
+  .discount-fields{grid-template-columns:1fr}.remove-discount{justify-self:start;min-height:36px;padding:0}
 
   .admin-page input,
   .admin-page textarea,
