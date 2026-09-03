@@ -78,13 +78,13 @@
 
 .admin-sidebar .admin-tab:hover {
   color: #fff;
-  background: #171717;
+  background: transparent;
 }
 
 .admin-sidebar .admin-tab.active {
-  color: #fff;
-  background: rgba(255, 106, 0, 0.13);
-  box-shadow: inset 3px 0 var(--orange);
+  color: var(--orange);
+  background: transparent;
+  box-shadow: none;
 }
 
 .nav-icon {
@@ -92,16 +92,16 @@
   height: 30px;
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  background: #202020;
+  border-radius: 0;
+  background: transparent;
   color: var(--orange);
   font-size: 15px;
   font-weight: 800;
 }
 
 .admin-tab.active .nav-icon {
-  background: var(--orange);
-  color: #fff;
+  background: transparent;
+  color: var(--orange);
 }
 
 .sidebar-footer {
