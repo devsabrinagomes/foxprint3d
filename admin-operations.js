@@ -16,6 +16,7 @@ document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('c
 const sidebar = document.querySelector('#adminSidebar');
 const sidebarToggle = document.querySelector('#sidebarToggle');
 const sidebarBackdrop = document.querySelector('#sidebarBackdrop');
+const sidebarCollapse = document.querySelector('#sidebarCollapse');
 function closeSidebar() {
   sidebar.classList.remove('open');
   sidebarBackdrop.classList.remove('visible');
@@ -28,6 +29,16 @@ sidebarToggle.addEventListener('click', () => {
   sidebarToggle.setAttribute('aria-expanded', String(opening));
 });
 sidebarBackdrop.addEventListener('click', closeSidebar);
+
+function setSidebarCollapsed(collapsed) {
+  document.body.classList.toggle('sidebar-collapsed', collapsed);
+  sidebarCollapse.textContent = collapsed ? '›' : '‹';
+  sidebarCollapse.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
+  sidebarCollapse.title = collapsed ? 'Expandir menu' : 'Recolher menu';
+  localStorage.setItem('fox-sidebar-collapsed', String(collapsed));
+}
+setSidebarCollapsed(localStorage.getItem('fox-sidebar-collapsed') === 'true');
+sidebarCollapse.addEventListener('click', () => setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed')));
 
 document.querySelector('#newSaleButton').addEventListener('click', () => openSale());
 document.querySelector('.sale-close').addEventListener('click', () => document.querySelector('#saleEditor').close());

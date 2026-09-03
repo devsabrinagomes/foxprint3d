@@ -17,11 +17,11 @@
     <section id="adminView" hidden class="admin-layout">
       <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
       <aside class="admin-sidebar" id="adminSidebar">
-        <a class="sidebar-brand" href="index.html" aria-label="FOX PRINT 3D — ir para a loja"><img src="marca/logo-foxprint3d.png" alt=""><span><b>FOX</b> PRINT 3D</span></a>
+        <div class="sidebar-brand-row"><a class="sidebar-brand" href="index.html" aria-label="FOX PRINT 3D — ir para a loja"><img src="marca/logo-foxprint3d.png" alt=""><span><b>FOX</b> PRINT 3D</span></a><button class="sidebar-collapse" id="sidebarCollapse" type="button" aria-label="Recolher menu" title="Recolher menu">‹</button></div>
         <nav class="admin-tabs" aria-label="Seções administrativas">
-          <button class="admin-tab active" data-view="productsView"><span class="nav-icon">◇</span><span>Produtos</span></button>
-          <button class="admin-tab" data-view="salesView"><span class="nav-icon">$</span><span>Vendas</span></button>
-          <button class="admin-tab" data-view="productionView"><span class="nav-icon">▤</span><span>Fila de impressão</span></button>
+          <button class="admin-tab active" data-view="productsView" title="Produtos"><span class="nav-icon">◇</span><span class="nav-label">Produtos</span></button>
+          <button class="admin-tab" data-view="salesView" title="Vendas"><span class="nav-icon">$</span><span class="nav-label">Vendas</span></button>
+          <button class="admin-tab" data-view="productionView" title="Fila de impressão"><span class="nav-icon">▤</span><span class="nav-label">Fila de impressão</span></button>
         </nav>
         <div class="sidebar-footer"><div class="admin-avatar">FP</div><div class="admin-identity"><strong>FOX PRINT 3D</strong><small id="adminEmail">Administrador</small></div><button id="logoutButton" type="button" title="Sair" aria-label="Sair">↪</button></div>
       </aside>
