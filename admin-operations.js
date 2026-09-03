@@ -43,6 +43,7 @@ sidebarCollapse.addEventListener('click', () => setSidebarCollapsed(!document.bo
 
 document.querySelector('#newSaleButton').addEventListener('click', () => openSale());
 document.querySelector('.sale-close').addEventListener('click', () => document.querySelector('#saleEditor').close());
+document.querySelector('#saleCancelButton').addEventListener('click', () => document.querySelector('#saleEditor').close());
 document.querySelector('#newJobButton').addEventListener('click', () => openJob());
 document.querySelector('.job-close').addEventListener('click', () => document.querySelector('#jobEditor').close());
 
@@ -98,7 +99,8 @@ function updateSaleTotalPreview() {
   const type = document.querySelector('#saleDiscountType').value;
   const entered = Number(document.querySelector('#saleDiscount').value || 0);
   const detail = discount > 0 ? ` · desconto ${type === 'percent' ? `${entered}% (${money(discount)})` : money(discount)}` : '';
-  document.querySelector('#saleTotalPreview').textContent = `Valor final: ${money(Math.max(0, total - discount))}${detail}`;
+  document.querySelector('#saleTotalPreview').textContent = money(Math.max(0, total - discount));
+  document.querySelector('#saleDiscountSummary').textContent = detail.replace(' · ', '');
 }
 function calculateDiscount(total) {
   if (document.querySelector('#discountFields').hidden) return 0;
