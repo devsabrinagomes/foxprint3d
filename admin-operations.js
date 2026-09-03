@@ -35,10 +35,11 @@ sidebarBackdrop.addEventListener('click', closeSidebar);
 
 function setSidebarCollapsed(collapsed) {
   document.body.classList.toggle('sidebar-collapsed', collapsed);
-  sidebarCollapse.textContent = collapsed ? '›' : '‹';
+  sidebarCollapse.innerHTML = `<i data-lucide="${collapsed ? 'panel-left-open' : 'panel-left-close'}"></i>`;
   sidebarCollapse.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
   sidebarCollapse.title = collapsed ? 'Expandir menu' : 'Recolher menu';
   localStorage.setItem('fox-sidebar-collapsed', String(collapsed));
+  window.refreshLucideIcons?.();
 }
 setSidebarCollapsed(localStorage.getItem('fox-sidebar-collapsed') === 'true');
 sidebarCollapse.addEventListener('click', () => setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed')));
@@ -158,6 +159,7 @@ function renderCustomers(list) {
     const href = isPhone ? `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`}` : `mailto:${encodeURIComponent(customer.contact)}`;
     return `<article class="customer-row"><div class="customer-avatar">${escapeHtml(customer.name.slice(0, 2).toUpperCase())}</div><div><strong>${escapeHtml(customer.name)}</strong><a href="${href}" target="_blank" rel="noreferrer">${escapeHtml(customer.contact)}</a></div><span class="consent-pill ${customer.marketing_consent ? 'allowed' : ''}">${customer.marketing_consent ? 'Aceita promoções' : 'Sem autorização'}</span></article>`;
   }).join('') : '<p class="empty-state">Nenhum cliente cadastrado.</p>';
+  window.refreshLucideIcons?.();
 }
 
 document.querySelector('#customerSearch').addEventListener('input', (event) => {
@@ -186,9 +188,10 @@ function renderBoard() {
   document.querySelector('#kanbanBoard').innerHTML = STAGES.map(([key, label]) => {
     const stageJobs = jobs.filter((job) => job.stage === key);
     const collapsed = collapsedStages.includes(key);
-    return `<section class="kanban-column${collapsed ? ' collapsed' : ''}" data-stage="${key}"><div class="kanban-head"><h3>${label}</h3><div class="kanban-head-actions"><span class="kanban-count">${stageJobs.length}</span><button class="collapse-column" type="button" data-collapse-stage="${key}" aria-label="${collapsed ? 'Expandir' : 'Recolher'} ${label}" title="${collapsed ? 'Expandir quadro' : 'Recolher quadro'}">${collapsed ? '›' : '‹'}</button></div></div><div class="kanban-cards">${stageJobs.map(jobCard).join('')}</div><button class="add-job" data-add-stage="${key}">＋ Adicionar cartão</button></section>`;
+    return `<section class="kanban-column${collapsed ? ' collapsed' : ''}" data-stage="${key}"><div class="kanban-head"><h3>${label}</h3><div class="kanban-head-actions"><span class="kanban-count">${stageJobs.length}</span><button class="collapse-column" type="button" data-collapse-stage="${key}" aria-label="${collapsed ? 'Expandir' : 'Recolher'} ${label}" title="${collapsed ? 'Expandir quadro' : 'Recolher quadro'}"><i data-lucide="${collapsed ? 'chevron-right' : 'chevron-left'}"></i></button></div></div><div class="kanban-cards">${stageJobs.map(jobCard).join('')}</div><button class="add-job" data-add-stage="${key}"><i data-lucide="plus"></i> Adicionar cartão</button></section>`;
   }).join('');
   bindBoardEvents();
+  window.refreshLucideIcons?.();
 }
 
 function jobCard(job) {

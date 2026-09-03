@@ -82,11 +82,12 @@ function openEditor(product = null) {
 
 function renderExistingImages() {
   const container = document.querySelector('#existingImages');
-  container.innerHTML = keptImages.map((url, index) => `<div class="existing-image"><img src="${escapeHtml(url)}" alt="Foto ${index + 1}"><button type="button" data-remove-image="${index}" aria-label="Remover foto">×</button></div>`).join('');
+  container.innerHTML = keptImages.map((url, index) => `<div class="existing-image"><img src="${escapeHtml(url)}" alt="Foto ${index + 1}"><button type="button" data-remove-image="${index}" aria-label="Remover foto"><i data-lucide="x"></i></button></div>`).join('');
   container.querySelectorAll('[data-remove-image]').forEach((button) => button.addEventListener('click', () => {
     keptImages.splice(Number(button.dataset.removeImage), 1);
     renderExistingImages();
   }));
+  window.refreshLucideIcons?.();
 }
 
 form.addEventListener('submit', async (event) => {
@@ -192,7 +193,7 @@ function initializeCustomSelects() {
 
     function renderOptions() {
       const selected = select.options[select.selectedIndex];
-      trigger.innerHTML = `<span>${selected?.textContent || 'Selecione'}</span><span class="select-chevron">⌄</span>`;
+      trigger.innerHTML = `<span>${selected?.textContent || 'Selecione'}</span><i class="select-chevron" data-lucide="chevron-down"></i>`;
       list.innerHTML = '';
       [...select.options].forEach((option) => {
         const item = document.createElement('button');
@@ -210,6 +211,7 @@ function initializeCustomSelects() {
         });
         list.append(item);
       });
+      window.refreshLucideIcons?.();
     }
 
     function closeMenu() {
@@ -247,4 +249,6 @@ document.addEventListener('click', (event) => {
     }
   });
 });
+window.refreshLucideIcons = () => window.lucide?.createIcons({ attrs: { 'stroke-width': 1.8 } });
 initializeCustomSelects();
+window.refreshLucideIcons();
