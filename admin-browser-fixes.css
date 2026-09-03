@@ -1,0 +1,26 @@
+/* Mantém os campos do painel escuros em navegadores com autofill claro. */
+.admin-page input,
+.admin-page textarea,
+.admin-page select {
+  color-scheme: dark;
+}
+
+.admin-page input:focus,
+.admin-page textarea:focus,
+.admin-page select:focus {
+  border-color: var(--orange);
+  outline: 3px solid rgba(255, 106, 0, 0.14);
+}
+
+.admin-page input:-webkit-autofill,
+.admin-page input:-webkit-autofill:hover,
+.admin-page input:-webkit-autofill:focus,
+.admin-page textarea:-webkit-autofill,
+.admin-page select:-webkit-autofill {
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #fff;
+  -webkit-box-shadow: 0 0 0 1000px #181818 inset !important;
+  box-shadow: 0 0 0 1000px #181818 inset !important;
+  border-color: #3a3a3a;
+  transition: background-color 9999s ease-out 0s;
+}
