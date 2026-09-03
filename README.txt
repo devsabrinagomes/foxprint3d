@@ -29,6 +29,10 @@ ATUALIZAÇÃO DE VENDAS E FILA DE IMPRESSÃO:
 Se o SQL inicial já foi executado antes, execute também supabase-operations.sql
 no SQL Editor. Ele cria as tabelas usadas pelas telas Vendas e Fila de impressão.
 
+LISTA DE CLIENTES:
+Execute supabase-customers.sql no SQL Editor para salvar automaticamente nome,
+contato e autorização de promoções ao registrar uma venda.
+
 Importante: nunca coloque a service_role key no site. Use somente a chave
 publishable/anon. As regras do arquivo SQL deixam alterações restritas a usuários
 autenticados e permitem ao público visualizar somente produtos ativos.

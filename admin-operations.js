@@ -4,12 +4,14 @@ const STAGES = [
 ];
 let sales = [];
 let jobs = [];
+let customers = [];
 let collapsedStages = JSON.parse(localStorage.getItem('fox-collapsed-stages') || '[]');
 
 document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('click', async () => {
   document.querySelectorAll('.admin-tab').forEach((item) => item.classList.toggle('active', item === tab));
   document.querySelectorAll('.admin-view').forEach((view) => { view.hidden = view.id !== tab.dataset.view; });
   if (tab.dataset.view === 'salesView') await loadSales();
+  if (tab.dataset.view === 'customersView') await loadCustomers();
   if (tab.dataset.view === 'productionView') await loadJobs();
   closeSidebar();
 }));
@@ -59,12 +61,18 @@ async function loadSales() {
   document.querySelectorAll('[data-sale]').forEach((button) => button.addEventListener('click', () => openSale(sales.find((sale) => sale.id === button.dataset.sale))));
 }
 
-function openSale(sale = null) {
+async function openSale(sale = null) {
   document.querySelector('#saleForm').reset();
   document.querySelector('#saleEditorTitle').textContent = sale ? 'Editar venda' : 'Nova venda';
   document.querySelector('#saleId').value = sale?.id || '';
   document.querySelector('#saleCustomer').value = sale?.customer || '';
   document.querySelector('#saleContact').value = sale?.contact || '';
+  document.querySelector('#saleMarketingConsent').checked = false;
+  if (sale?.contact) {
+    const normalizedContact = sale.contact.replace(/\s+/g, ' ').trim().toLowerCase();
+    const { data: savedCustomer } = await db.from('customers').select('marketing_consent').eq('contact', normalizedContact).maybeSingle();
+    document.querySelector('#saleMarketingConsent').checked = Boolean(savedCustomer?.marketing_consent);
+  }
   document.querySelector('#saleDescription').value = sale?.description || '';
   document.querySelector('#saleTotal').value = sale?.total ?? '';
   document.querySelector('#saleDiscountType').value = 'fixed';
@@ -89,6 +97,13 @@ document.querySelector('#saleForm').addEventListener('submit', async (event) => 
   const discount = calculateDiscount(total);
   if (discount > total) return document.querySelector('#saleStatusText').textContent = 'O desconto não pode ser maior que o valor da venda.';
   const payload = { customer: val('saleCustomer'), contact: val('saleContact'), description: val('saleDescription'), total, discount, paid: Number(val('salePaid') || 0), payment_method: val('saleMethod'), status: val('saleStatus'), sale_date: val('saleDate'), due_date: val('saleDueDate') || null, notes: val('saleNotes'), updated_at: new Date().toISOString() };
+  const normalizedContact = payload.contact.replace(/\s+/g, ' ').trim().toLowerCase();
+  const { data: existingCustomer } = await db.from('customers').select('id,marketing_consent').eq('contact', normalizedContact).maybeSingle();
+  const customerData = { name: payload.customer, contact: normalizedContact, marketing_consent: document.querySelector('#saleMarketingConsent').checked, updated_at: new Date().toISOString() };
+  const { error: customerError } = existingCustomer
+    ? await db.from('customers').update(customerData).eq('id', existingCustomer.id)
+    : await db.from('customers').insert(customerData);
+  if (customerError) return document.querySelector('#saleStatusText').textContent = `Erro ao salvar cliente: ${customerError.message}`;
   const { error } = await (id ? db.from('sales').update(payload).eq('id', id) : db.from('sales').insert(payload));
   if (error) return document.querySelector('#saleStatusText').textContent = error.message;
   document.querySelector('#saleEditor').close(); await loadSales();
@@ -126,6 +141,39 @@ document.querySelector('.delete-sale').addEventListener('click', async () => {
   const { error } = await db.from('sales').delete().eq('id', id);
   if (error) return alert(error.message);
   document.querySelector('#saleEditor').close(); await loadSales();
+});
+
+async function loadCustomers() {
+  const { data, error } = await db.from('customers').select('*').order('name');
+  if (error) return alert(`Erro ao carregar clientes: ${error.message}`);
+  customers = data || [];
+  renderCustomers(customers);
+}
+
+function renderCustomers(list) {
+  document.querySelector('#customerCount').textContent = `${list.length} cliente${list.length === 1 ? '' : 's'}`;
+  document.querySelector('#customerList').innerHTML = list.length ? list.map((customer) => {
+    const isPhone = /^\+?[\d ()-]{8,}$/.test(customer.contact);
+    const cleanPhone = customer.contact.replace(/\D/g, '');
+    const href = isPhone ? `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`}` : `mailto:${encodeURIComponent(customer.contact)}`;
+    return `<article class="customer-row"><div class="customer-avatar">${escapeHtml(customer.name.slice(0, 2).toUpperCase())}</div><div><strong>${escapeHtml(customer.name)}</strong><a href="${href}" target="_blank" rel="noreferrer">${escapeHtml(customer.contact)}</a></div><span class="consent-pill ${customer.marketing_consent ? 'allowed' : ''}">${customer.marketing_consent ? 'Aceita promoções' : 'Sem autorização'}</span></article>`;
+  }).join('') : '<p class="empty-state">Nenhum cliente cadastrado.</p>';
+}
+
+document.querySelector('#customerSearch').addEventListener('input', (event) => {
+  const query = event.target.value.trim().toLowerCase();
+  renderCustomers(customers.filter((customer) => `${customer.name} ${customer.contact}`.toLowerCase().includes(query)));
+});
+
+document.querySelector('#exportCustomersButton').addEventListener('click', () => {
+  const allowed = customers.filter((customer) => customer.marketing_consent);
+  if (!allowed.length) return alert('Nenhum cliente autorizou o recebimento de promoções.');
+  const csv = ['Nome,Contato', ...allowed.map((customer) => `"${customer.name.replaceAll('"', '""')}","${customer.contact.replaceAll('"', '""')}"`)].join('\n');
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  link.download = 'clientes-foxprint3d.csv';
+  link.click();
+  URL.revokeObjectURL(link.href);
 });
 
 async function loadJobs() {

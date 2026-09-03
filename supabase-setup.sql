@@ -46,3 +46,10 @@ create table if not exists public.print_jobs (
 );
 alter table public.print_jobs enable row level security;
 create policy "Admin gerencia fila" on public.print_jobs for all to authenticated using (true) with check (true);
+
+create table if not exists public.customers (
+  id uuid primary key default gen_random_uuid(), name text not null, contact text not null unique,
+  marketing_consent boolean not null default false, created_at timestamptz not null default now(), updated_at timestamptz not null default now()
+);
+alter table public.customers enable row level security;
+create policy "Admin gerencia clientes" on public.customers for all to authenticated using (true) with check (true);
