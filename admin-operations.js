@@ -50,11 +50,11 @@ async function loadSales() {
   const { data, error } = await db.from('sales').select('*').order('sale_date', { ascending: false });
   if (error) return alert(`Erro ao carregar vendas: ${error.message}`);
   sales = data || [];
-  const total = sales.filter((s) => s.status !== 'cancelado').reduce((sum, s) => sum + Number(s.total), 0);
+  const total = sales.filter((s) => s.status !== 'cancelado').reduce((sum, s) => sum + Math.max(0, Number(s.total) - Number(s.discount || 0)), 0);
   const received = sales.filter((s) => s.status !== 'cancelado').reduce((sum, s) => sum + Number(s.paid), 0);
   const pending = Math.max(0, total - received);
   document.querySelector('#salesSummary').innerHTML = [['Vendas', sales.length], ['Total vendido', money(total)], ['Recebido', money(received)], ['A receber', money(pending)]].map(([label, value]) => `<div class="summary-card"><small>${label}</small><strong>${value}</strong></div>`).join('');
-  document.querySelector('#salesList').innerHTML = sales.length ? sales.map((sale) => `<tr><td><strong>${escapeHtml(sale.customer)}</strong><small>${escapeHtml(sale.description)}</small></td><td>${money(sale.total)}<small>Pago: ${money(sale.paid)}</small></td><td><span class="payment-pill ${sale.status}">${sale.status}</span><small>${escapeHtml(sale.payment_method)}</small></td><td>${formatDate(sale.due_date) || '—'}</td><td class="row-actions"><button data-sale="${sale.id}">Editar</button></td></tr>`).join('') : '<tr><td colspan="5">Nenhuma venda registrada.</td></tr>';
+  document.querySelector('#salesList').innerHTML = sales.length ? sales.map((sale) => { const discount = Number(sale.discount || 0); const finalValue = Math.max(0, Number(sale.total) - discount); return `<tr><td><strong>${escapeHtml(sale.customer)}</strong><small>${escapeHtml(sale.description)}</small></td><td><strong>${money(finalValue)}</strong>${discount > 0 ? `<span class="discount-pill">Desconto ${money(discount)}</span><small class="original-value">De ${money(sale.total)}</small>` : ''}<small>Pago: ${money(sale.paid)}</small></td><td><span class="payment-pill ${sale.status}">${sale.status}</span><small>${escapeHtml(sale.payment_method)}</small></td><td>${formatDate(sale.due_date) || '—'}</td><td class="row-actions"><button data-sale="${sale.id}">Editar</button></td></tr>`; }).join('') : '<tr><td colspan="5">Nenhuma venda registrada.</td></tr>';
   document.querySelectorAll('[data-sale]').forEach((button) => button.addEventListener('click', () => openSale(sales.find((sale) => sale.id === button.dataset.sale))));
 }
 
@@ -66,12 +66,14 @@ function openSale(sale = null) {
   document.querySelector('#saleContact').value = sale?.contact || '';
   document.querySelector('#saleDescription').value = sale?.description || '';
   document.querySelector('#saleTotal').value = sale?.total ?? '';
+  document.querySelector('#saleDiscount').value = sale?.discount ?? 0;
   document.querySelector('#salePaid').value = sale?.paid ?? 0;
   document.querySelector('#saleMethod').value = sale?.payment_method || 'Pix';
   document.querySelector('#saleStatus').value = sale?.status || 'pendente';
   document.querySelector('#saleDate').value = sale?.sale_date || new Date().toISOString().slice(0, 10);
   document.querySelector('#saleDueDate').value = sale?.due_date || '';
   document.querySelector('#saleNotes').value = sale?.notes || '';
+  updateSaleTotalPreview();
   document.querySelector('.delete-sale').hidden = !sale;
   document.querySelector('#saleEditor').showModal();
 }
@@ -79,11 +81,22 @@ function openSale(sale = null) {
 document.querySelector('#saleForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const id = document.querySelector('#saleId').value;
-  const payload = { customer: val('saleCustomer'), contact: val('saleContact'), description: val('saleDescription'), total: Number(val('saleTotal')), paid: Number(val('salePaid') || 0), payment_method: val('saleMethod'), status: val('saleStatus'), sale_date: val('saleDate'), due_date: val('saleDueDate') || null, notes: val('saleNotes'), updated_at: new Date().toISOString() };
+  const total = Number(val('saleTotal'));
+  const discount = Number(val('saleDiscount') || 0);
+  if (discount > total) return document.querySelector('#saleStatusText').textContent = 'O desconto não pode ser maior que o valor da venda.';
+  const payload = { customer: val('saleCustomer'), contact: val('saleContact'), description: val('saleDescription'), total, discount, paid: Number(val('salePaid') || 0), payment_method: val('saleMethod'), status: val('saleStatus'), sale_date: val('saleDate'), due_date: val('saleDueDate') || null, notes: val('saleNotes'), updated_at: new Date().toISOString() };
   const { error } = await (id ? db.from('sales').update(payload).eq('id', id) : db.from('sales').insert(payload));
   if (error) return document.querySelector('#saleStatusText').textContent = error.message;
   document.querySelector('#saleEditor').close(); await loadSales();
 });
+
+function updateSaleTotalPreview() {
+  const total = Number(document.querySelector('#saleTotal').value || 0);
+  const discount = Number(document.querySelector('#saleDiscount').value || 0);
+  document.querySelector('#saleTotalPreview').textContent = `Valor final: ${money(Math.max(0, total - discount))}`;
+}
+document.querySelector('#saleTotal').addEventListener('input', updateSaleTotalPreview);
+document.querySelector('#saleDiscount').addEventListener('input', updateSaleTotalPreview);
 
 document.querySelector('.delete-sale').addEventListener('click', async () => {
   const id = val('saleId');

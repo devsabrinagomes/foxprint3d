@@ -22,6 +22,10 @@
   vertical-align: middle;
 }
 
+.discount-pill{display:inline-flex;margin-left:8px;padding:4px 7px;border-radius:999px;background:rgba(255,106,0,.14);color:#ff9b52;font-size:10px;font-weight:800;vertical-align:middle}
+.sales-table .original-value{color:#777;text-decoration:line-through}
+.sale-total-preview{padding:13px 15px;border:1px solid rgba(255,106,0,.28);border-radius:11px;background:rgba(255,106,0,.08);color:#ffad6c;font-weight:800;text-align:right}
+
 html,
 body,
 .admin-sidebar,

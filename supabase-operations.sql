@@ -2,13 +2,14 @@
 
 create table if not exists public.sales (
   id uuid primary key default gen_random_uuid(), customer text not null, contact text default '',
-  description text not null, total numeric(10,2) not null default 0, paid numeric(10,2) not null default 0,
+  description text not null, total numeric(10,2) not null default 0, discount numeric(10,2) not null default 0, paid numeric(10,2) not null default 0,
   payment_method text default 'Pix', status text not null default 'pendente', sale_date date not null default current_date,
   due_date date, notes text default '', created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
 alter table public.sales enable row level security;
 drop policy if exists "Admin gerencia vendas" on public.sales;
 create policy "Admin gerencia vendas" on public.sales for all to authenticated using (true) with check (true);
+alter table public.sales add column if not exists discount numeric(10,2) not null default 0;
 
 create table if not exists public.print_jobs (
   id uuid primary key default gen_random_uuid(), title text not null, stage text not null default 'ideias',

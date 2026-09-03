@@ -32,7 +32,7 @@ create policy "Admin exclui fotos" on storage.objects for delete to authenticate
 
 create table if not exists public.sales (
   id uuid primary key default gen_random_uuid(), customer text not null, contact text default '',
-  description text not null, total numeric(10,2) not null default 0, paid numeric(10,2) not null default 0,
+  description text not null, total numeric(10,2) not null default 0, discount numeric(10,2) not null default 0, paid numeric(10,2) not null default 0,
   payment_method text default 'Pix', status text not null default 'pendente', sale_date date not null default current_date,
   due_date date, notes text default '', created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
