@@ -124,14 +124,36 @@ form.addEventListener('submit', async (event) => {
 async function uploadImages(files) {
   const urls = [];
   for (const file of files) {
-    if (file.size > 5 * 1024 * 1024) throw new Error(`${file.name} ultrapassa 5 MB.`);
-    const extension = file.name.split('.').pop().toLowerCase();
-    const path = `${crypto.randomUUID()}.${extension}`;
-    const { error } = await db.storage.from('products').upload(path, file, { cacheControl: '3600' });
+    if (file.size > 15 * 1024 * 1024) throw new Error(`${file.name} ultrapassa o limite de 15 MB para conversão.`);
+    const webpFile = await convertImageToWebP(file);
+    if (webpFile.size > 5 * 1024 * 1024) throw new Error(`${file.name} continuou maior que 5 MB após a conversão.`);
+    const path = `${crypto.randomUUID()}.webp`;
+    const { error } = await db.storage.from('products').upload(path, webpFile, { cacheControl: '3600', contentType: 'image/webp' });
     if (error) throw error;
     urls.push(db.storage.from('products').getPublicUrl(path).data.publicUrl);
   }
   return urls;
+}
+
+async function convertImageToWebP(file) {
+  const image = await createImageBitmap(file);
+  const maxDimension = 2000;
+  const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+  const width = Math.max(1, Math.round(image.width * scale));
+  const height = Math.max(1, Math.round(image.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext('2d', { alpha: true });
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = 'high';
+  context.drawImage(image, 0, 0, width, height);
+  image.close();
+
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', 0.86));
+  if (!blob || blob.type !== 'image/webp') throw new Error(`Seu navegador não conseguiu converter ${file.name} para WebP.`);
+  const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '-').toLowerCase();
+  return new File([blob], `${baseName || 'produto'}.webp`, { type: 'image/webp' });
 }
 
 async function deleteProduct(id) {
