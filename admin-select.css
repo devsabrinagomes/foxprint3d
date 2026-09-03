@@ -112,3 +112,22 @@
     font-size: 15px;
   }
 }
+
+/* Aproxima a primeira seção do subtítulo no modal de vendas. */
+.sale-editor .sale-editor-head {
+  padding-bottom: 13px;
+}
+
+.sale-editor .sale-form-body {
+  padding-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .sale-editor .sale-editor-head {
+    padding-bottom: 11px;
+  }
+
+  .sale-editor .sale-form-body {
+    padding-top: 12px;
+  }
+}
