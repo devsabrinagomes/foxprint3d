@@ -5,20 +5,31 @@
   <meta name="robots" content="noindex,nofollow"><title>Admin | FOX PRINT 3D</title><link rel="icon" type="image/png" href="marca/logo-foxprint3d.png">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="admin.css"><link rel="stylesheet" href="admin-browser-fixes.css">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="admin.css"><link rel="stylesheet" href="admin-browser-fixes.css"><link rel="stylesheet" href="admin-layout.css">
 </head>
 <body class="admin-page">
-  <header class="admin-header"><a class="brand" href="index.html"><img class="brand-logo" src="marca/logo-foxprint3d.png" alt=""><span class="brand-name"><span class="brand-mark">FOX</span> PRINT 3D</span></a><a href="index.html" class="admin-back">Ver loja ↗</a></header>
+  <header class="admin-header"><button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button><a class="brand" href="index.html"><img class="brand-logo" src="marca/logo-foxprint3d.png" alt=""><span class="brand-name"><span class="brand-mark">FOX</span> PRINT 3D</span></a><a href="index.html" class="admin-back">Ver loja ↗</a></header>
   <main class="admin-shell">
     <section class="admin-login" id="loginView">
       <span class="eyebrow">ÁREA RESTRITA</span><h1>Administração</h1><p>Entre com o usuário criado no Supabase.</p>
       <form id="loginForm"><label>E-mail<input id="loginEmail" type="email" required></label><label>Senha<input id="loginPassword" type="password" required></label><button class="btn" type="submit">Entrar</button><p class="form-status" id="loginStatus"></p></form>
     </section>
-    <section id="adminView" hidden>
-      <div class="admin-top"><nav class="admin-tabs" aria-label="Seções administrativas"><button class="admin-tab active" data-view="productsView">Produtos</button><button class="admin-tab" data-view="salesView">Vendas</button><button class="admin-tab" data-view="productionView">Fila de impressão</button></nav><button class="btn btn-outline" id="logoutButton">Sair</button></div>
-      <section class="admin-view" id="productsView"><div class="admin-title"><div><span class="eyebrow">CATÁLOGO</span><h1>Produtos</h1></div><button class="btn" id="newProductButton">Novo produto</button></div><div class="admin-products" id="adminProducts"></div></section>
-      <section class="admin-view" id="salesView" hidden><div class="admin-title"><div><span class="eyebrow">FINANCEIRO</span><h1>Vendas e pagamentos</h1></div><button class="btn" id="newSaleButton">Nova venda</button></div><div class="summary-grid" id="salesSummary"></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Cliente / pedido</th><th>Valor</th><th>Pagamento</th><th>Entrega</th><th></th></tr></thead><tbody id="salesList"></tbody></table></div></section>
-      <section class="admin-view" id="productionView" hidden><div class="admin-title"><div><span class="eyebrow">PRODUÇÃO</span><h1>Fila de impressão</h1><p>Arraste cada cartão entre as etapas.</p></div><button class="btn" id="newJobButton">Novo cartão</button></div><div class="kanban" id="kanbanBoard"></div></section>
+    <section id="adminView" hidden class="admin-layout">
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+      <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-heading"><small>PAINEL</small><strong>Administração</strong></div>
+        <nav class="admin-tabs" aria-label="Seções administrativas">
+          <button class="admin-tab active" data-view="productsView"><span class="nav-icon">◇</span><span>Produtos</span></button>
+          <button class="admin-tab" data-view="salesView"><span class="nav-icon">$</span><span>Vendas</span></button>
+          <button class="admin-tab" data-view="productionView"><span class="nav-icon">▤</span><span>Fila de impressão</span></button>
+        </nav>
+        <div class="sidebar-footer"><div class="admin-avatar">FP</div><div class="admin-identity"><strong>FOX PRINT 3D</strong><small id="adminEmail">Administrador</small></div><button id="logoutButton" type="button" title="Sair" aria-label="Sair">↪</button></div>
+      </aside>
+      <div class="admin-content">
+        <section class="admin-view" id="productsView"><div class="admin-title"><div><span class="eyebrow">CATÁLOGO</span><h1>Produtos</h1></div><button class="btn" id="newProductButton">Novo produto</button></div><div class="admin-products" id="adminProducts"></div></section>
+        <section class="admin-view" id="salesView" hidden><div class="admin-title"><div><span class="eyebrow">FINANCEIRO</span><h1>Vendas e pagamentos</h1></div><button class="btn" id="newSaleButton">Nova venda</button></div><div class="summary-grid" id="salesSummary"></div><div class="sales-table-wrap"><table class="sales-table"><thead><tr><th>Cliente / pedido</th><th>Valor</th><th>Pagamento</th><th>Entrega</th><th></th></tr></thead><tbody id="salesList"></tbody></table></div></section>
+        <section class="admin-view" id="productionView" hidden><div class="admin-title"><div><span class="eyebrow">PRODUÇÃO</span><h1>Fila de impressão</h1><p>Arraste cada cartão entre as etapas.</p></div><button class="btn" id="newJobButton">Novo cartão</button></div><div class="kanban" id="kanbanBoard"></div></section>
+      </div>
     </section>
   </main>
   <dialog class="product-editor" id="productEditor">

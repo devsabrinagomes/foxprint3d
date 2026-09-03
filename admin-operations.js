@@ -10,7 +10,24 @@ document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('c
   document.querySelectorAll('.admin-view').forEach((view) => { view.hidden = view.id !== tab.dataset.view; });
   if (tab.dataset.view === 'salesView') await loadSales();
   if (tab.dataset.view === 'productionView') await loadJobs();
+  closeSidebar();
 }));
+
+const sidebar = document.querySelector('#adminSidebar');
+const sidebarToggle = document.querySelector('#sidebarToggle');
+const sidebarBackdrop = document.querySelector('#sidebarBackdrop');
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  sidebarBackdrop.classList.remove('visible');
+  sidebarToggle.setAttribute('aria-expanded', 'false');
+}
+sidebarToggle.addEventListener('click', () => {
+  const opening = !sidebar.classList.contains('open');
+  sidebar.classList.toggle('open', opening);
+  sidebarBackdrop.classList.toggle('visible', opening);
+  sidebarToggle.setAttribute('aria-expanded', String(opening));
+});
+sidebarBackdrop.addEventListener('click', closeSidebar);
 
 document.querySelector('#newSaleButton').addEventListener('click', () => openSale());
 document.querySelector('.sale-close').addEventListener('click', () => document.querySelector('#saleEditor').close());

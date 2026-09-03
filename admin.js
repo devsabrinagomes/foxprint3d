@@ -22,7 +22,11 @@ async function startAdmin() {
 async function showSession(session) {
   loginView.hidden = Boolean(session);
   adminView.hidden = !session;
-  if (session) await loadProducts();
+  document.body.classList.toggle('admin-authenticated', Boolean(session));
+  if (session) {
+    document.querySelector('#adminEmail').textContent = session.user.email || 'Administrador';
+    await loadProducts();
+  }
 }
 
 document.querySelector('#loginForm').addEventListener('submit', async (event) => {
