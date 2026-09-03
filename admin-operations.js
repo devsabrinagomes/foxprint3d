@@ -35,7 +35,7 @@ sidebarBackdrop.addEventListener('click', closeSidebar);
 
 function setSidebarCollapsed(collapsed) {
   document.body.classList.toggle('sidebar-collapsed', collapsed);
-  sidebarCollapse.innerHTML = `<i data-lucide="${collapsed ? 'panel-left-open' : 'panel-left-close'}"></i>`;
+  sidebarCollapse.innerHTML = `<i data-lucide="${collapsed ? 'chevron-right' : 'chevron-left'}"></i>`;
   sidebarCollapse.setAttribute('aria-label', collapsed ? 'Expandir menu' : 'Recolher menu');
   sidebarCollapse.title = collapsed ? 'Expandir menu' : 'Recolher menu';
   localStorage.setItem('fox-sidebar-collapsed', String(collapsed));
