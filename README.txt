@@ -25,6 +25,10 @@ PAINEL ADMINISTRATIVO COM SUPABASE:
 5. Cole os dois valores no arquivo supabase-config.js.
 6. Acesse /admin.html para entrar e cadastrar produtos e fotos.
 
+ATUALIZAÇÃO DE VENDAS E FILA DE IMPRESSÃO:
+Se o SQL inicial já foi executado antes, execute também supabase-operations.sql
+no SQL Editor. Ele cria as tabelas usadas pelas telas Vendas e Fila de impressão.
+
 Importante: nunca coloque a service_role key no site. Use somente a chave
 publishable/anon. As regras do arquivo SQL deixam alterações restritas a usuários
 autenticados e permitem ao público visualizar somente produtos ativos.
