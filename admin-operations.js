@@ -1,6 +1,6 @@
 const STAGES = [
-  ['ideias', 'Ideias'], ['preparar', 'Preparar arquivo'], ['pronto', 'Pronto para imprimir'],
-  ['imprimindo', 'Em impressão'], ['acabamento', 'Acabamento'], ['finalizado', 'Finalizado']
+  ['ideias', 'Ideias', 'lightbulb'], ['preparar', 'Preparar arquivo', 'file-cog'], ['pronto', 'Pronto para imprimir', 'badge-check'],
+  ['imprimindo', 'Em impressão', 'printer'], ['acabamento', 'Acabamento', 'sparkles'], ['finalizado', 'Finalizado', 'circle-check-big']
 ];
 let sales = [];
 let jobs = [];
@@ -224,10 +224,10 @@ async function loadJobs() {
 }
 
 function renderBoard() {
-  document.querySelector('#kanbanBoard').innerHTML = STAGES.map(([key, label]) => {
+  document.querySelector('#kanbanBoard').innerHTML = STAGES.map(([key, label, icon]) => {
     const stageJobs = jobs.filter((job) => job.stage === key);
     const collapsed = collapsedStages.includes(key);
-    return `<section class="kanban-column${collapsed ? ' collapsed' : ''}" data-stage="${key}"><div class="kanban-head"><h3>${label}</h3><div class="kanban-head-actions"><span class="kanban-count">${stageJobs.length}</span><button class="collapse-column" type="button" data-collapse-stage="${key}" aria-label="${collapsed ? 'Expandir' : 'Recolher'} ${label}" title="${collapsed ? 'Expandir quadro' : 'Recolher quadro'}"><i data-lucide="${collapsed ? 'chevron-right' : 'chevron-left'}"></i></button></div></div><div class="kanban-cards">${stageJobs.map(jobCard).join('')}</div><button class="add-job" data-add-stage="${key}"><i data-lucide="plus"></i> Adicionar cartão</button></section>`;
+    return `<section class="kanban-column${collapsed ? ' collapsed' : ''}" data-stage="${key}"><div class="kanban-head"><div class="kanban-stage-title"><span class="stage-icon"><i data-lucide="${icon}"></i></span><h3>${label}</h3></div><div class="kanban-head-actions"><span class="kanban-count">${stageJobs.length}</span><button class="collapse-column" type="button" data-collapse-stage="${key}" aria-label="${collapsed ? 'Expandir' : 'Recolher'} ${label}" title="${collapsed ? 'Expandir quadro' : 'Recolher quadro'}"><i data-lucide="${collapsed ? 'chevron-right' : 'chevron-left'}"></i></button></div></div><div class="kanban-cards">${stageJobs.map(jobCard).join('')}</div><button class="add-job" data-add-stage="${key}"><i data-lucide="plus"></i> Adicionar cartão</button></section>`;
   }).join('');
   bindBoardEvents();
   window.refreshLucideIcons?.();

@@ -107,6 +107,25 @@ body,
   gap: 7px;
 }
 
+.kanban-stage-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.stage-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #302820;
+  border-radius: 8px;
+  background: rgba(255, 106, 0, .08);
+  color: #ff8a38;
+}
+
 .collapse-column {
   width: 28px;
   height: 28px;
@@ -138,6 +157,11 @@ body,
   flex-direction: column;
   justify-content: flex-start;
   gap: 14px;
+}
+
+.kanban-column.collapsed .kanban-stage-title {
+  flex-direction: column;
+  gap: 10px;
 }
 
 .kanban-column.collapsed .kanban-head h3 {
