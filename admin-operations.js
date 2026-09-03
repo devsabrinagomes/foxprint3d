@@ -157,8 +157,19 @@ function renderCustomers(list) {
     const isPhone = /^\+?[\d ()-]{8,}$/.test(customer.contact);
     const cleanPhone = customer.contact.replace(/\D/g, '');
     const href = isPhone ? `https://wa.me/${cleanPhone.startsWith('55') ? cleanPhone : `55${cleanPhone}`}` : `mailto:${encodeURIComponent(customer.contact)}`;
-    return `<article class="customer-row"><div class="customer-avatar">${escapeHtml(customer.name.slice(0, 2).toUpperCase())}</div><div><strong>${escapeHtml(customer.name)}</strong><a href="${href}" target="_blank" rel="noreferrer">${escapeHtml(customer.contact)}</a></div><span class="consent-pill ${customer.marketing_consent ? 'allowed' : ''}">${customer.marketing_consent ? 'Aceita promoções' : 'Sem autorização'}</span></article>`;
+    return `<article class="customer-row"><div class="customer-avatar">${escapeHtml(customer.name.slice(0, 2).toUpperCase())}</div><div><strong>${escapeHtml(customer.name)}</strong><a href="${href}" target="_blank" rel="noreferrer">${escapeHtml(customer.contact)}</a></div><label class="customer-consent"><input type="checkbox" data-customer-consent="${customer.id}" ${customer.marketing_consent ? 'checked' : ''}><span>Aceita promoções</span></label></article>`;
   }).join('') : '<p class="empty-state">Nenhum cliente cadastrado.</p>';
+  document.querySelectorAll('[data-customer-consent]').forEach((checkbox) => checkbox.addEventListener('change', async () => {
+    checkbox.disabled = true;
+    const { error } = await db.from('customers').update({ marketing_consent: checkbox.checked, updated_at: new Date().toISOString() }).eq('id', checkbox.dataset.customerConsent);
+    checkbox.disabled = false;
+    if (error) {
+      checkbox.checked = !checkbox.checked;
+      return alert(`Não foi possível atualizar: ${error.message}`);
+    }
+    const customer = customers.find((item) => item.id === checkbox.dataset.customerConsent);
+    if (customer) customer.marketing_consent = checkbox.checked;
+  }));
   window.refreshLucideIcons?.();
 }
 
