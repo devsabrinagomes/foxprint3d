@@ -90,24 +90,27 @@
   position: absolute;
   z-index: 70;
   top: 82px;
-  right: -16px;
-  width: 32px;
-  height: 32px;
+  right: -15px;
+  width: 30px;
+  height: 30px;
   display: grid;
   place-items: center;
-  border: 1px solid #303030;
-  border-radius: 10px;
-  background: #161616;
-  color: #aaa;
-  font-size: 22px;
+  border: 1px solid #282828;
+  border-radius: 9px;
+  background: #121212;
+  color: #777;
+  font-size: 20px;
   line-height: 1;
-  box-shadow: 0 5px 16px rgba(0,0,0,.35);
+  box-shadow: 0 3px 10px rgba(0,0,0,.24);
   cursor: pointer;
+  transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
 }
 
 .sidebar-collapse:hover {
   border-color: #555;
-  color: var(--orange);
+  background: #1c1c1c;
+  color: #fff;
+  box-shadow: 0 5px 16px rgba(0,0,0,.4);
 }
 
 .sidebar-brand img {
@@ -250,7 +253,7 @@
   .admin-sidebar,
   .admin-content,
   .admin-authenticated .admin-header {
-    transition: width .22s ease, margin-left .22s ease, left .22s ease;
+    transition: width 180ms ease, margin-left 180ms ease, left 180ms ease;
   }
 
   .sidebar-collapsed .admin-sidebar {
@@ -285,7 +288,7 @@
   }
 
   .sidebar-collapsed .sidebar-collapse {
-    right: -16px;
+    right: -15px;
   }
 
   .sidebar-collapsed .admin-sidebar .admin-tab {
