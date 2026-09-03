@@ -31,7 +31,8 @@ no SQL Editor. Ele cria as tabelas usadas pelas telas Vendas e Fila de impressã
 
 LISTA DE CLIENTES:
 Execute supabase-customers.sql no SQL Editor para salvar automaticamente nome,
-contato e autorização de promoções ao registrar uma venda.
+contato e autorização de promoções ao registrar uma venda. Ao abrir a aba Clientes,
+o painel também importa os contatos das vendas antigas sem criar duplicatas.
 
 Importante: nunca coloque a service_role key no site. Use somente a chave
 publishable/anon. As regras do arquivo SQL deixam alterações restritas a usuários

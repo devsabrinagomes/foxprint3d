@@ -145,10 +145,38 @@ document.querySelector('.delete-sale').addEventListener('click', async () => {
 });
 
 async function loadCustomers() {
+  await syncCustomersFromSales();
   const { data, error } = await db.from('customers').select('*').order('name');
   if (error) return alert(`Erro ao carregar clientes: ${error.message}`);
   customers = data || [];
   renderCustomers(customers);
+}
+
+async function syncCustomersFromSales() {
+  const { data: oldSales, error: salesError } = await db
+    .from('sales')
+    .select('customer,contact,sale_date,created_at')
+    .order('sale_date', { ascending: false })
+    .order('created_at', { ascending: false });
+  if (salesError) {
+    console.error('Não foi possível sincronizar os clientes das vendas:', salesError.message);
+    return;
+  }
+
+  const uniqueCustomers = new Map();
+  (oldSales || []).forEach((sale) => {
+    const contact = String(sale.contact || '').replace(/\s+/g, ' ').trim().toLowerCase();
+    const name = String(sale.customer || '').trim();
+    if (contact && name && !uniqueCustomers.has(contact)) {
+      uniqueCustomers.set(contact, { name, contact, marketing_consent: false });
+    }
+  });
+  if (!uniqueCustomers.size) return;
+
+  const { error } = await db
+    .from('customers')
+    .upsert([...uniqueCustomers.values()], { onConflict: 'contact', ignoreDuplicates: true });
+  if (error) console.error('Não foi possível importar clientes antigos:', error.message);
 }
 
 function renderCustomers(list) {
