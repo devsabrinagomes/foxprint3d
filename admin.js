@@ -76,6 +76,7 @@ function openEditor(product = null) {
   document.querySelector('#productActive').checked = product?.active ?? true;
   document.querySelector('#productStatus').textContent = '';
   renderExistingImages();
+  window.syncCustomSelects?.();
   editor.showModal();
 }
 
@@ -170,3 +171,80 @@ function escapeHtml(value = '') {
 function formatPrice(value) {
   return value == null ? 'Sob consulta' : Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
+
+function initializeCustomSelects() {
+  document.querySelectorAll('.admin-page select:not([data-customized])').forEach((select) => {
+    select.dataset.customized = 'true';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'custom-select';
+    select.parentNode.insertBefore(wrapper, select);
+    wrapper.append(select);
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'custom-select-trigger';
+    trigger.setAttribute('aria-haspopup', 'listbox');
+    trigger.setAttribute('aria-expanded', 'false');
+    const list = document.createElement('div');
+    list.className = 'custom-select-menu';
+    list.setAttribute('role', 'listbox');
+    wrapper.append(trigger, list);
+
+    function renderOptions() {
+      const selected = select.options[select.selectedIndex];
+      trigger.innerHTML = `<span>${selected?.textContent || 'Selecione'}</span><span class="select-chevron">⌄</span>`;
+      list.innerHTML = '';
+      [...select.options].forEach((option) => {
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = `custom-select-option${option.selected ? ' selected' : ''}`;
+        item.setAttribute('role', 'option');
+        item.setAttribute('aria-selected', String(option.selected));
+        item.textContent = option.textContent;
+        item.addEventListener('click', () => {
+          select.value = option.value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          renderOptions();
+          closeMenu();
+          trigger.focus();
+        });
+        list.append(item);
+      });
+    }
+
+    function closeMenu() {
+      wrapper.classList.remove('open');
+      trigger.setAttribute('aria-expanded', 'false');
+    }
+
+    trigger.addEventListener('click', () => {
+      const opening = !wrapper.classList.contains('open');
+      document.querySelectorAll('.custom-select.open').forEach((item) => item.classList.remove('open'));
+      wrapper.classList.toggle('open', opening);
+      trigger.setAttribute('aria-expanded', String(opening));
+    });
+    trigger.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeMenu();
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        wrapper.classList.add('open');
+        trigger.setAttribute('aria-expanded', 'true');
+        list.querySelector('.selected')?.focus();
+      }
+    });
+    select.addEventListener('change', renderOptions);
+    wrapper._syncCustomSelect = renderOptions;
+    renderOptions();
+  });
+}
+
+window.syncCustomSelects = () => document.querySelectorAll('.custom-select').forEach((wrapper) => wrapper._syncCustomSelect?.());
+document.addEventListener('click', (event) => {
+  document.querySelectorAll('.custom-select.open').forEach((wrapper) => {
+    if (!wrapper.contains(event.target)) {
+      wrapper.classList.remove('open');
+      wrapper.querySelector('.custom-select-trigger').setAttribute('aria-expanded', 'false');
+    }
+  });
+});
+initializeCustomSelects();

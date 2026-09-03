@@ -78,6 +78,7 @@ function openSale(sale = null) {
   document.querySelector('#saleNotes').value = sale?.notes || '';
   updateSaleTotalPreview();
   document.querySelector('.delete-sale').hidden = !sale;
+  window.syncCustomSelects?.();
   document.querySelector('#saleEditor').showModal();
 }
 
@@ -206,6 +207,7 @@ function openJob(job = null, stage = 'ideias') {
   document.querySelector('#jobForm').reset(); document.querySelector('#jobEditorTitle').textContent = job ? 'Editar cartão' : 'Novo cartão';
   document.querySelector('#jobId').value = job?.id || ''; document.querySelector('#jobTitle').value = job?.title || ''; document.querySelector('#jobStage').value = job?.stage || stage; document.querySelector('#jobPriority').value = job?.priority || 'normal'; document.querySelector('#jobMinutes').value = job?.estimated_minutes || ''; document.querySelector('#jobDueDate').value = job?.due_date || ''; document.querySelector('#jobNotes').value = job?.notes || '';
   document.querySelector('.delete-job').hidden = !job; document.querySelector('#jobEditor').showModal();
+  window.syncCustomSelects?.();
 }
 
 document.querySelector('#jobForm').addEventListener('submit', async (event) => {
