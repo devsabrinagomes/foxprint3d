@@ -41,6 +41,15 @@ document.querySelector('#loginForm').addEventListener('submit', async (event) =>
 });
 
 document.querySelector('#logoutButton').addEventListener('click', () => db.auth.signOut());
+document.querySelector('#togglePassword').addEventListener('click', (event) => {
+  const input = document.querySelector('#loginPassword');
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  event.currentTarget.innerHTML = `<i data-lucide="${showing ? 'eye' : 'eye-off'}"></i>`;
+  event.currentTarget.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Ocultar senha');
+  event.currentTarget.title = showing ? 'Mostrar senha' : 'Ocultar senha';
+  window.refreshLucideIcons?.();
+});
 document.querySelector('#newProductButton').addEventListener('click', () => openEditor());
 document.querySelector('.editor-close').addEventListener('click', () => editor.close());
 

@@ -12,7 +12,7 @@
   <main class="admin-shell">
     <section class="admin-login" id="loginView">
       <span class="eyebrow">ÁREA RESTRITA</span><h1>Administração</h1><p>Entre com o usuário criado no Supabase.</p>
-      <form id="loginForm"><label>E-mail<input id="loginEmail" type="email" required></label><label>Senha<input id="loginPassword" type="password" required></label><button class="btn" type="submit">Entrar</button><p class="form-status" id="loginStatus"></p></form>
+      <form id="loginForm"><label>E-mail<input id="loginEmail" type="email" autocomplete="username" required></label><label>Senha<span class="password-field"><input id="loginPassword" type="password" autocomplete="current-password" required><button id="togglePassword" type="button" aria-label="Mostrar senha" title="Mostrar senha"><i data-lucide="eye"></i></button></span></label><button class="btn" type="submit">Entrar</button><p class="form-status" id="loginStatus"></p></form>
     </section>
     <section id="adminView" hidden class="admin-layout">
       <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
