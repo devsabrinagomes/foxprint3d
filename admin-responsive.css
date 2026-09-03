@@ -12,6 +12,16 @@
   overscroll-behavior: contain;
 }
 
+.sales-table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.sales-table td:nth-child(3) small {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
 @media (max-width: 1024px) {
   .admin-sidebar {
     width: 220px;
