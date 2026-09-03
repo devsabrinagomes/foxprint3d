@@ -12,15 +12,13 @@
   overscroll-behavior: contain;
 }
 
-.sales-table td:nth-child(3) {
-  white-space: nowrap;
-}
-
-.sales-table td:nth-child(3) small {
-  display: inline-block;
-  margin-left: 10px;
-  vertical-align: middle;
-}
+.payment-info{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.payment-method{color:#eee;font-size:13px;font-weight:700;line-height:1.2}
+.payment-info .payment-pill{display:inline-flex;align-items:center;width:max-content;padding:3px 7px;border-radius:999px;font-size:11px;line-height:1.2;text-transform:capitalize}
+.payment-info .payment-pill.pendente{background:#34230e;color:#ffad57}
+.payment-info .payment-pill.parcial{background:#332b12;color:#e5c65a}
+.payment-info .payment-pill.pago{background:#17321f;color:#70db87}
+.payment-info .payment-pill.cancelado{background:#321b1b;color:#df7777}
 
 .discount-pill{display:inline-flex;margin-left:8px;padding:4px 7px;border-radius:999px;background:rgba(255,106,0,.14);color:#ff9b52;font-size:10px;font-weight:800;vertical-align:middle}
 .sales-table .original-value{color:#777;text-decoration:line-through}
