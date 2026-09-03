@@ -127,13 +127,17 @@
 
 .admin-sidebar .admin-tab:hover {
   color: #fff;
-  background: transparent;
+  background: #181818;
 }
 
 .admin-sidebar .admin-tab.active {
   color: var(--orange);
-  background: transparent;
+  background: rgba(255, 106, 0, 0.12);
   box-shadow: none;
+}
+
+.admin-sidebar .admin-tab.active:hover {
+  background: rgba(255, 106, 0, 0.18);
 }
 
 .nav-icon {
