@@ -10,6 +10,8 @@ alter table public.sales enable row level security;
 drop policy if exists "Admin gerencia vendas" on public.sales;
 create policy "Admin gerencia vendas" on public.sales for all to authenticated using (true) with check (true);
 alter table public.sales add column if not exists discount numeric(10,2) not null default 0;
+alter table public.sales add column if not exists delivered boolean not null default false;
+alter table public.sales add column if not exists delivered_at timestamptz;
 
 create table if not exists public.print_jobs (
   id uuid primary key default gen_random_uuid(), title text not null, stage text not null default 'ideias',

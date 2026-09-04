@@ -27,6 +27,7 @@ async function showSession(session) {
   if (session) {
     document.querySelector('#adminEmail').textContent = session.user.email || 'Administrador';
     await loadProducts();
+    await window.loadDashboard?.();
   }
 }
 
@@ -53,6 +54,10 @@ document.querySelector('#togglePassword').addEventListener('click', (event) => {
 });
 document.querySelector('#newProductButton').addEventListener('click', () => openEditor());
 document.querySelector('.editor-close').addEventListener('click', () => editor.close());
+document.querySelector('#productCancelButton').addEventListener('click', () => editor.close());
+document.querySelector('#productSearch').addEventListener('input', renderFilteredProducts);
+document.querySelector('#productCategoryFilter').addEventListener('change', renderFilteredProducts);
+document.querySelector('#productStatusFilter').addEventListener('change', renderFilteredProducts);
 
 async function loadProducts() {
   const container = document.querySelector('#adminProducts');
@@ -61,16 +66,49 @@ async function loadProducts() {
   if (error) return container.innerHTML = `<p>Erro: ${escapeHtml(error.message)}</p>`;
   products = data || [];
   refreshCategoryOptions();
-  container.innerHTML = products.length ? products.map((product) => `
+  refreshProductFilterOptions();
+  renderFilteredProducts();
+}
+
+function renderFilteredProducts() {
+  const query = document.querySelector('#productSearch').value.trim().toLowerCase();
+  const category = document.querySelector('#productCategoryFilter').value;
+  const status = document.querySelector('#productStatusFilter').value;
+  const filtered = products.filter((product) => {
+    const matchesText = !query || `${product.name} ${product.category} ${product.tag} ${product.description}`.toLowerCase().includes(query);
+    const matchesCategory = category === 'all' || product.category === category;
+    const matchesStatus = status === 'all' || (status === 'active' ? product.active : !product.active);
+    return matchesText && matchesCategory && matchesStatus;
+  });
+  renderProducts(filtered);
+}
+
+function renderProducts(list) {
+  const container = document.querySelector('#adminProducts');
+  document.querySelector('#productResultCount').textContent = `${list.length} produto${list.length === 1 ? '' : 's'}`;
+  container.innerHTML = list.length ? list.map((product) => `
     <article class="admin-product">
       ${product.images?.[0] ? `<img src="${escapeHtml(product.images[0])}" alt="">` : '<div class="admin-product-placeholder">📦</div>'}
-      <div><h3>${escapeHtml(product.name)}</h3><p>${formatPrice(product.price)} · ${escapeHtml(product.category)} · ${product.images?.length || 0} foto(s)</p></div>
+      <div><h3>${escapeHtml(product.name)}</h3><p>${formatPrice(product.price)} · ${escapeHtml(categoryLabel(product.category))} · ${product.images?.length || 0} foto(s)</p></div>
       <span class="status-pill${product.active ? '' : ' off'}">${product.active ? 'Visível' : 'Oculto'}</span>
       <div class="admin-actions"><button data-edit="${product.id}">Editar</button><button data-delete="${product.id}">Excluir</button></div>
     </article>`).join('') : '<p>Nenhum produto cadastrado.</p>';
 
   container.querySelectorAll('[data-edit]').forEach((button) => button.addEventListener('click', () => openEditor(products.find((item) => item.id === button.dataset.edit))));
   container.querySelectorAll('[data-delete]').forEach((button) => button.addEventListener('click', () => deleteProduct(button.dataset.delete)));
+}
+
+function refreshProductFilterOptions() {
+  const select = document.querySelector('#productCategoryFilter');
+  const current = select.value || 'all';
+  const categories = new Map([['all', 'Todas']]);
+  defaultCategories.forEach(([value, label]) => categories.set(value, label));
+  products.forEach((product) => {
+    if (product.category) categories.set(product.category, categoryLabel(product.category));
+  });
+  select.innerHTML = [...categories].map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
+  select.value = categories.has(current) ? current : 'all';
+  window.syncCustomSelects?.();
 }
 
 function openEditor(product = null) {

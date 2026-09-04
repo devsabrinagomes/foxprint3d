@@ -7,13 +7,21 @@ let jobs = [];
 let customers = [];
 let collapsedStages = JSON.parse(localStorage.getItem('fox-collapsed-stages') || '[]');
 
-document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('click', async () => {
+async function activateAdminView(tab) {
   document.querySelectorAll('.admin-tab').forEach((item) => item.classList.toggle('active', item === tab));
   document.querySelectorAll('.admin-view').forEach((view) => { view.hidden = view.id !== tab.dataset.view; });
+  if (tab.dataset.view === 'dashboardView') await loadDashboard();
+  if (tab.dataset.view === 'productsView') await loadProducts();
   if (tab.dataset.view === 'salesView') await loadSales();
   if (tab.dataset.view === 'customersView') await loadCustomers();
   if (tab.dataset.view === 'productionView') await loadJobs();
   closeSidebar();
+}
+
+document.querySelectorAll('.admin-tab').forEach((tab) => tab.addEventListener('click', () => activateAdminView(tab)));
+document.querySelectorAll('[data-open-view]').forEach((button) => button.addEventListener('click', () => {
+  const tab = document.querySelector(`.admin-tab[data-view="${button.dataset.openView}"]`);
+  if (tab) activateAdminView(tab);
 }));
 
 const sidebar = document.querySelector('#adminSidebar');
@@ -45,10 +53,70 @@ setSidebarCollapsed(localStorage.getItem('fox-sidebar-collapsed') === 'true');
 sidebarCollapse.addEventListener('click', () => setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed')));
 
 document.querySelector('#newSaleButton').addEventListener('click', () => openSale());
+document.querySelector('#dashboardNewSaleButton').addEventListener('click', () => openSale());
 document.querySelector('.sale-close').addEventListener('click', () => document.querySelector('#saleEditor').close());
 document.querySelector('#saleCancelButton').addEventListener('click', () => document.querySelector('#saleEditor').close());
+document.querySelector('#saleSearch').addEventListener('input', renderFilteredSales);
+document.querySelector('#salePaymentFilter').addEventListener('change', renderFilteredSales);
+document.querySelector('#saleStatusFilter').addEventListener('change', renderFilteredSales);
 document.querySelector('#newJobButton').addEventListener('click', () => openJob());
 document.querySelector('.job-close').addEventListener('click', () => document.querySelector('#jobEditor').close());
+
+async function loadDashboard() {
+  const status = document.querySelector('#dashboardStatus');
+  status.textContent = '';
+  const [{ data: saleData, error: salesError }, { data: jobData, error: jobsError }] = await Promise.all([
+    db.from('sales').select('*').order('sale_date', { ascending: false }),
+    db.from('print_jobs').select('*').order('position')
+  ]);
+  if (salesError || jobsError) {
+    status.textContent = `Não foi possível carregar o resumo: ${(salesError || jobsError).message}`;
+    return;
+  }
+
+  sales = saleData || [];
+  jobs = jobData || [];
+  const today = new Date();
+  const todayKey = localDateKey(today);
+  const monthKey = todayKey.slice(0, 7);
+  const validSales = sales.filter((sale) => sale.status !== 'cancelado');
+  const monthSales = validSales.filter((sale) => String(sale.sale_date || '').startsWith(monthKey));
+  const monthTotal = monthSales.reduce((sum, sale) => sum + saleFinalValue(sale), 0);
+  const monthReceived = monthSales.reduce((sum, sale) => sum + Number(sale.paid || 0), 0);
+  const allPending = validSales.reduce((sum, sale) => sum + Math.max(0, saleFinalValue(sale) - Number(sale.paid || 0)), 0);
+  const activeJobs = jobs.filter((job) => job.stage !== 'finalizado');
+
+  const summary = [
+    ['calendar-days', 'Vendido no mês', money(monthTotal), `${monthSales.length} venda${monthSales.length === 1 ? '' : 's'}`],
+    ['circle-check-big', 'Recebido no mês', money(monthReceived), 'pagamentos registrados'],
+    ['clock-3', 'Total a receber', money(allPending), 'vendas não canceladas'],
+    ['printer', 'Em produção', activeJobs.length, 'cartões ativos']
+  ];
+  document.querySelector('#dashboardSummary').innerHTML = summary.map(([icon, label, value, detail]) => `<article class="dashboard-stat"><span><i data-lucide="${icon}"></i></span><div><small>${label}</small><strong>${value}</strong><em>${detail}</em></div></article>`).join('');
+
+  const deliveries = validSales
+    .filter((sale) => sale.due_date && !sale.delivered)
+    .sort((a, b) => a.due_date.localeCompare(b.due_date))
+    .slice(0, 6);
+  document.querySelector('#dashboardDeliveries').innerHTML = deliveries.length ? `<div class="dashboard-list">${deliveries.map((sale) => {
+    const overdue = sale.due_date < todayKey;
+    return `<article class="dashboard-delivery${overdue ? ' overdue' : ''}"><span class="delivery-date"><strong>${formatDay(sale.due_date)}</strong><small>${formatMonth(sale.due_date)}</small></span><button type="button" class="dashboard-delivery-open" data-dashboard-sale="${sale.id}"><strong>${escapeHtml(sale.customer)}</strong><small>${escapeHtml(sale.description)}</small></button><div class="dashboard-delivery-actions"><em>${overdue ? 'Atrasada' : money(saleFinalValue(sale))}</em><button type="button" data-dashboard-delivered="${sale.id}" title="Marcar pedido como entregue"><i data-lucide="package-check"></i> Entregue</button></div></article>`;
+  }).join('')}</div>` : '<p class="dashboard-empty">Nenhuma entrega agendada.</p>';
+
+  document.querySelector('#dashboardProduction').innerHTML = STAGES.map(([key, label, icon]) => {
+    const count = jobs.filter((job) => job.stage === key).length;
+    return `<button type="button" class="production-stage" data-dashboard-stage="${key}"><span><i data-lucide="${icon}"></i></span><strong>${label}</strong><em>${count}</em></button>`;
+  }).join('');
+
+  document.querySelectorAll('[data-dashboard-sale]').forEach((button) => button.addEventListener('click', () => openSale(sales.find((sale) => sale.id === button.dataset.dashboardSale))));
+  document.querySelectorAll('[data-dashboard-delivered]').forEach((button) => button.addEventListener('click', () => markSaleAsDelivered(button.dataset.dashboardDelivered, button, true)));
+  document.querySelectorAll('[data-dashboard-stage]').forEach((button) => button.addEventListener('click', () => {
+    const tab = document.querySelector('.admin-tab[data-view="productionView"]');
+    if (tab) activateAdminView(tab);
+  }));
+  window.refreshLucideIcons?.();
+}
+window.loadDashboard = loadDashboard;
 
 async function loadSales() {
   const { data, error } = await db.from('sales').select('*').order('sale_date', { ascending: false });
@@ -58,12 +126,64 @@ async function loadSales() {
   const received = sales.filter((s) => s.status !== 'cancelado').reduce((sum, s) => sum + Number(s.paid), 0);
   const pending = Math.max(0, total - received);
   document.querySelector('#salesSummary').innerHTML = [['Vendas', sales.length], ['Total vendido', money(total)], ['Recebido', money(received)], ['A receber', money(pending)]].map(([label, value]) => `<div class="summary-card"><small>${label}</small><strong>${value}</strong></div>`).join('');
-  document.querySelector('#salesList').innerHTML = sales.length ? sales.map((sale) => { const discount = Number(sale.discount || 0); const finalValue = Math.max(0, Number(sale.total) - discount); return `<tr><td><strong>${escapeHtml(sale.customer)}</strong><small>${escapeHtml(sale.description)}</small></td><td><strong>${money(finalValue)}</strong>${discount > 0 ? `<span class="discount-pill">Desconto ${money(discount)}</span><small class="original-value">De ${money(sale.total)}</small>` : ''}<small>Pago: ${money(sale.paid)}</small></td><td><div class="payment-info"><strong class="payment-method">${escapeHtml(sale.payment_method)}</strong><span class="payment-pill ${sale.status}">${sale.status}</span></div></td><td>${formatDate(sale.due_date) || '—'}</td><td class="row-actions"><button data-sale="${sale.id}">Editar</button></td></tr>`; }).join('') : '<tr><td colspan="5">Nenhuma venda registrada.</td></tr>';
+  renderFilteredSales();
+}
+
+function renderFilteredSales() {
+  const query = document.querySelector('#saleSearch').value.trim().toLowerCase();
+  const payment = document.querySelector('#salePaymentFilter').value;
+  const status = document.querySelector('#saleStatusFilter').value;
+  const filtered = sales.filter((sale) => {
+    const matchesText = !query || `${sale.customer} ${sale.contact} ${sale.description} ${sale.payment_method} ${sale.status}`.toLowerCase().includes(query);
+    const matchesPayment = payment === 'all' || sale.payment_method === payment;
+    const matchesStatus = status === 'all' || sale.status === status;
+    return matchesText && matchesPayment && matchesStatus;
+  });
+  renderSales(filtered);
+}
+
+function renderSales(list) {
+  document.querySelector('#saleResultCount').textContent = `${list.length} venda${list.length === 1 ? '' : 's'}`;
+  document.querySelector('#salesList').innerHTML = list.length ? list.map((sale) => { const discount = Number(sale.discount || 0); const finalValue = Math.max(0, Number(sale.total) - discount); const awaitingPayment = sale.status !== 'pago' && sale.status !== 'cancelado'; const awaitingDelivery = !sale.delivered && sale.status !== 'cancelado'; return `<tr><td><strong>${escapeHtml(sale.customer)}</strong><small>${escapeHtml(sale.description)}</small></td><td><strong>${money(finalValue)}</strong>${discount > 0 ? `<span class="discount-pill">Desconto ${money(discount)}</span><small class="original-value">De ${money(sale.total)}</small>` : ''}<small>Pago: ${money(sale.paid)}</small></td><td><div class="payment-info"><strong class="payment-method">${escapeHtml(sale.payment_method)}</strong><span class="payment-pill ${sale.status}">${sale.status}</span></div></td><td><div class="delivery-info"><strong>${formatDate(sale.due_date) || 'Sem previsão'}</strong><span class="delivery-pill ${sale.delivered ? 'delivered' : 'pending'}">${sale.delivered ? 'Entregue' : 'Pendente'}</span></div></td><td class="row-actions"><div class="row-action-buttons">${awaitingPayment ? `<button class="quick-paid" data-mark-paid="${sale.id}" title="Registrar valor total como recebido"><i data-lucide="circle-check-big"></i> Marcar como pago</button>` : ''}${awaitingDelivery ? `<button class="quick-delivered" data-mark-delivered="${sale.id}" title="Marcar pedido como entregue"><i data-lucide="package-check"></i> Marcar entregue</button>` : ''}<button data-sale="${sale.id}">Editar</button></div></td></tr>`; }).join('') : '<tr><td colspan="5">Nenhuma venda encontrada.</td></tr>';
   document.querySelectorAll('[data-sale]').forEach((button) => button.addEventListener('click', () => openSale(sales.find((sale) => sale.id === button.dataset.sale))));
+  document.querySelectorAll('[data-mark-paid]').forEach((button) => button.addEventListener('click', () => markSaleAsPaid(button.dataset.markPaid, button)));
+  document.querySelectorAll('[data-mark-delivered]').forEach((button) => button.addEventListener('click', () => markSaleAsDelivered(button.dataset.markDelivered, button)));
+  window.refreshLucideIcons?.();
+}
+
+async function markSaleAsPaid(id, button) {
+  const sale = sales.find((item) => item.id === id);
+  if (!sale) return;
+  button.disabled = true;
+  const paid = saleFinalValue(sale);
+  const { error } = await db.from('sales').update({ paid, status: 'pago', updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) {
+    button.disabled = false;
+    return alert(`Não foi possível registrar o pagamento: ${error.message}`);
+  }
+  sale.paid = paid;
+  sale.status = 'pago';
+  await loadSales();
+}
+
+async function markSaleAsDelivered(id, button, fromDashboard = false) {
+  const sale = sales.find((item) => item.id === id);
+  if (!sale) return;
+  button.disabled = true;
+  const { error } = await db.from('sales').update({ delivered: true, delivered_at: new Date().toISOString(), updated_at: new Date().toISOString() }).eq('id', id);
+  if (error) {
+    button.disabled = false;
+    return alert(`Não foi possível registrar a entrega: ${error.message}`);
+  }
+  sale.delivered = true;
+  sale.delivered_at = new Date().toISOString();
+  if (fromDashboard) await loadDashboard();
+  else await loadSales();
 }
 
 async function openSale(sale = null) {
   document.querySelector('#saleForm').reset();
+  document.querySelector('#saleStatusText').textContent = '';
   document.querySelector('#saleEditorTitle').textContent = sale ? 'Editar venda' : 'Nova venda';
   document.querySelector('#saleId').value = sale?.id || '';
   document.querySelector('#saleCustomer').value = sale?.customer || '';
@@ -84,7 +204,10 @@ async function openSale(sale = null) {
   document.querySelector('#saleStatus').value = sale?.status || 'pendente';
   document.querySelector('#saleDate').value = sale?.sale_date || new Date().toISOString().slice(0, 10);
   document.querySelector('#saleDueDate').value = sale?.due_date || '';
+  document.querySelector('#saleDelivered').checked = Boolean(sale?.delivered);
   document.querySelector('#saleNotes').value = sale?.notes || '';
+  document.querySelector('#saleAddToQueue').checked = false;
+  document.querySelector('#saleQueueOption').hidden = Boolean(sale);
   updateSaleTotalPreview();
   document.querySelector('.delete-sale').hidden = !sale;
   window.syncCustomSelects?.();
@@ -97,7 +220,9 @@ document.querySelector('#saleForm').addEventListener('submit', async (event) => 
   const total = Number(val('saleTotal'));
   const discount = calculateDiscount(total);
   if (discount > total) return document.querySelector('#saleStatusText').textContent = 'O desconto não pode ser maior que o valor da venda.';
-  const payload = { customer: val('saleCustomer'), contact: val('saleContact'), description: val('saleDescription'), total, discount, paid: Number(val('salePaid') || 0), payment_method: val('saleMethod'), status: val('saleStatus'), sale_date: val('saleDate'), due_date: val('saleDueDate') || null, notes: val('saleNotes'), updated_at: new Date().toISOString() };
+  const delivered = document.querySelector('#saleDelivered').checked;
+  const currentSale = id ? sales.find((sale) => sale.id === id) : null;
+  const payload = { customer: val('saleCustomer'), contact: val('saleContact'), description: val('saleDescription'), total, discount, paid: Number(val('salePaid') || 0), payment_method: val('saleMethod'), status: val('saleStatus'), sale_date: val('saleDate'), due_date: val('saleDueDate') || null, delivered, delivered_at: delivered ? (currentSale?.delivered_at || new Date().toISOString()) : null, notes: val('saleNotes'), updated_at: new Date().toISOString() };
   const normalizedContact = payload.contact.replace(/\s+/g, ' ').trim().toLowerCase();
   const { data: existingCustomer } = await db.from('customers').select('id,marketing_consent').eq('contact', normalizedContact).maybeSingle();
   const customerData = { name: payload.customer, contact: normalizedContact, marketing_consent: document.querySelector('#saleMarketingConsent').checked, updated_at: new Date().toISOString() };
@@ -105,9 +230,38 @@ document.querySelector('#saleForm').addEventListener('submit', async (event) => 
     ? await db.from('customers').update(customerData).eq('id', existingCustomer.id)
     : await db.from('customers').insert(customerData);
   if (customerError) return document.querySelector('#saleStatusText').textContent = `Erro ao salvar cliente: ${customerError.message}`;
-  const { error } = await (id ? db.from('sales').update(payload).eq('id', id) : db.from('sales').insert(payload));
-  if (error) return document.querySelector('#saleStatusText').textContent = error.message;
-  document.querySelector('#saleEditor').close(); await loadSales();
+  let savedSaleId = id;
+  let saveError;
+  if (id) {
+    const { error } = await db.from('sales').update(payload).eq('id', id);
+    saveError = error;
+  } else {
+    const { data, error } = await db.from('sales').insert(payload).select('id').single();
+    saveError = error;
+    savedSaleId = data?.id || '';
+  }
+  if (saveError) return document.querySelector('#saleStatusText').textContent = saveError.message;
+
+  let queueError = null;
+  if (!id && document.querySelector('#saleAddToQueue').checked) {
+    const queuePayload = {
+      title: `${payload.customer} — ${payload.description}`,
+      stage: 'preparar',
+      priority: 'normal',
+      estimated_minutes: 0,
+      due_date: payload.due_date,
+      notes: `Cliente: ${payload.customer}\nContato: ${payload.contact}\nVenda: ${savedSaleId}`,
+      position: jobs.length,
+      updated_at: new Date().toISOString()
+    };
+    const result = await db.from('print_jobs').insert(queuePayload);
+    queueError = result.error;
+  }
+
+  document.querySelector('#saleEditor').close();
+  await loadSales();
+  if (!document.querySelector('#dashboardView').hidden) await loadDashboard();
+  if (queueError) alert(`A venda foi salva, mas não conseguimos criar o cartão na fila: ${queueError.message}`);
 });
 
 function updateSaleTotalPreview() {
@@ -310,3 +464,14 @@ document.querySelector('.delete-job').addEventListener('click', async () => { co
 function val(id) { return document.querySelector(`#${id}`).value.trim(); }
 function money(value) { return Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
 function formatDate(value) { return value ? new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR') : ''; }
+function saleFinalValue(sale) { return Math.max(0, Number(sale.total || 0) - Number(sale.discount || 0)); }
+function localDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+function formatDay(value) { return String(Number(String(value).slice(8, 10))).padStart(2, '0'); }
+function formatMonth(value) { return new Date(`${value}T12:00:00`).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', ''); }
+
+if (!document.querySelector('#adminView').hidden) loadDashboard();

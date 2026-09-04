@@ -117,7 +117,7 @@ document.querySelectorAll('.product-card:not([data-gallery-ready])').forEach((ca
 
     const thumbs = document.createElement('div');
     thumbs.className = 'gallery-thumbs';
-    availableImages.forEach((src, index) => {
+    availableImages.slice(0, 2).forEach((src, index) => {
       const thumb = document.createElement('button');
       thumb.type = 'button';
       thumb.className = `gallery-thumb${index === 0 ? ' active' : ''}`;
@@ -132,6 +132,26 @@ document.querySelectorAll('.product-card:not([data-gallery-ready])').forEach((ca
       });
       thumbs.append(thumb);
     });
+
+    if (availableImages.length > 2) {
+      const remainingImages = availableImages.length - 2;
+      const moreButton = document.createElement('button');
+      moreButton.type = 'button';
+      moreButton.className = 'gallery-thumb gallery-more';
+      moreButton.setAttribute('aria-label', `Ver mais ${remainingImages} foto${remainingImages > 1 ? 's' : ''} de ${title}`);
+
+      const preview = document.createElement('img');
+      preview.src = availableImages[2];
+      preview.alt = '';
+
+      const count = document.createElement('span');
+      count.textContent = `+${remainingImages}`;
+
+      moreButton.append(preview, count);
+      moreButton.addEventListener('click', () => openImageModal(availableImages, 2, title));
+      thumbs.append(moreButton);
+    }
+
     gallery.append(thumbs);
     mainImage.onclick = () => openImageModal(availableImages, 0, title);
   }

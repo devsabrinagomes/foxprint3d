@@ -45,7 +45,7 @@
         </div>
         <div class="hero-art" aria-hidden="true">
           <div class="hero-glow"></div>
-          <div class="fox-watermark"><img src="marca/logo-foxprint3d.png" alt="" /></div>
+          <div class="fox-watermark"><img src="marca/fox-face.png" alt="" /></div>
           <div class="printer-assembly">
             <div class="printer-rail"><span></span><span></span></div>
             <div class="printer-head">
@@ -54,8 +54,19 @@
               <div class="heater-block"><span></span></div>
               <div class="printer-nozzle"></div>
             </div>
-            <div class="filament"></div>
-            <div class="printed-piece"><span></span><span></span><span></span></div>
+            <svg class="filament-drawing" viewBox="0 0 160 168" aria-hidden="true">
+              <defs>
+                <linearGradient id="filamentOrange" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stop-color="#ffd09a" />
+                  <stop offset=".35" stop-color="#ff8a24" />
+                  <stop offset="1" stop-color="#ff5a00" />
+                </linearGradient>
+                <path id="filamentShape" d="M80 2 L80 23 C80 35 91 38 89 51 C87 67 48 70 48 86 C48 101 103 101 103 117 C103 132 62 132 58 143 C55 151 78 155 104 153 C132 151 144 158 132 163 C113 171 48 168 30 162 C18 158 27 153 42 151" />
+              </defs>
+              <use href="#filamentShape" class="filament-glow" />
+              <use href="#filamentShape" class="filament-core" />
+              <use href="#filamentShape" class="filament-shimmer" />
+            </svg>
             <div class="print-bed"></div>
           </div>
         </div>
